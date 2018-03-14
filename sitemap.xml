@@ -26,25 +26,11 @@
     
 
     
-        
     <url>
-     <loc>/tutorial/application_example/</loc>
+     <loc>/tutorial/</loc>
      <lastmod>2018-03-14</lastmod>
      <changefreq>daily</changefreq>
     </url>
-        
-    <url>
-     <loc>/tutorial/project_setup/</loc>
-     <lastmod>2018-03-14</lastmod>
-     <changefreq>daily</changefreq>
-    </url>
-        
-    <url>
-     <loc>/tutorial/create_book_action/</loc>
-     <lastmod>2018-03-14</lastmod>
-     <changefreq>daily</changefreq>
-    </url>
-        
     
 
 </urlset>
