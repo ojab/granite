@@ -92,7 +92,7 @@
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="search">
     <label class="md-overlay" data-md-component="overlay" for="drawer"></label>
     
-      <a href="#applicatin-example" tabindex="1" class="md-skip">
+      <a href="#application-example" tabindex="1" class="md-skip">
         Skip to content
       </a>
     
@@ -609,7 +609,7 @@
                   <a href="https://github.com/toptal/granite/edit/master/docs/tutorial.md" title="Edit this page" class="md-icon md-content__icon">&#xE3C9;</a>
                 
                 
-                <h1 id="applicatin-example">Applicatin example<a class="headerlink" href="#applicatin-example" title="Permanent link">&para;</a></h1>
+                <h1 id="application-example">Application example<a class="headerlink" href="#application-example" title="Permanent link">&para;</a></h1>
 <p>The business we're going to cover is very simple.</p>
 <p>We have a simple book library and we need to allow logged users to create new
 books and rent it.</p>
@@ -838,6 +838,49 @@ assign the attributes.</p>
 </pre></div>
 
 
+<p>The last step is replace the current book creation in the controller to call
+the BA instead.</p>
+<p>First thing is rescue from Granite::NotAllowed when some action is not allowed
+to be executed.</p>
+<div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">BooksController</span> <span class="o">&lt;</span> <span class="no">ApplicationController</span>
+  <span class="n">rescue_from</span> <span class="no">Granite</span><span class="o">::</span><span class="no">Action</span><span class="o">::</span><span class="no">NotAllowedError</span> <span class="k">do</span> <span class="o">|</span><span class="n">exception</span><span class="o">|</span>
+    <span class="n">redirect_to</span> <span class="n">books_path</span><span class="p">,</span> <span class="ss">alert</span><span class="p">:</span> <span class="s1">&#39;You\&#39;re not allowed to execute this action.&#39;</span>
+  <span class="k">end</span>
+  <span class="c1"># ...</span>
+<span class="k">end</span>
+</pre></div>
+
+
+<p>It will generically manage exceptions case some unauthorized user try to
+force performing an action without having access.</p>
+<p>The next step is wrap the method <code>#create</code> with the proper business action
+call.</p>
+<div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">BooksController</span> <span class="o">&lt;</span> <span class="no">ApplicationController</span>
+
+  <span class="c1"># ...</span>
+
+  <span class="c1"># POST /books</span>
+  <span class="c1"># POST /books.json</span>
+  <span class="k">def</span> <span class="nf">create</span>
+    <span class="n">book_action</span> <span class="o">=</span> <span class="no">BA</span><span class="o">::</span><span class="no">Book</span><span class="o">::</span><span class="no">Create</span><span class="o">.</span><span class="n">as</span><span class="p">(</span><span class="n">current_user</span><span class="p">)</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">book_params</span><span class="p">)</span>
+
+    <span class="n">respond_to</span> <span class="k">do</span> <span class="o">|</span><span class="nb">format</span><span class="o">|</span>
+      <span class="k">if</span> <span class="n">book_action</span><span class="o">.</span><span class="n">perform</span>
+        <span class="nb">format</span><span class="o">.</span><span class="n">html</span> <span class="p">{</span> <span class="n">redirect_to</span> <span class="n">book_action</span><span class="o">.</span><span class="n">subject</span><span class="p">,</span> <span class="ss">notice</span><span class="p">:</span> <span class="s1">&#39;Book was successfully created.&#39;</span> <span class="p">}</span>
+        <span class="nb">format</span><span class="o">.</span><span class="n">json</span> <span class="p">{</span> <span class="n">render</span> <span class="ss">:show</span><span class="p">,</span> <span class="ss">status</span><span class="p">:</span> <span class="ss">:created</span><span class="p">,</span> <span class="ss">location</span><span class="p">:</span> <span class="n">book_action</span><span class="o">.</span><span class="n">subject</span> <span class="p">}</span>
+      <span class="k">else</span>
+        <span class="vi">@book</span> <span class="o">=</span> <span class="n">book_action</span><span class="o">.</span><span class="n">subject</span>
+        <span class="nb">format</span><span class="o">.</span><span class="n">html</span> <span class="p">{</span> <span class="n">render</span> <span class="ss">:new</span> <span class="p">}</span>
+        <span class="nb">format</span><span class="o">.</span><span class="n">json</span> <span class="p">{</span> <span class="n">render</span> <span class="ss">json</span><span class="p">:</span> <span class="n">book_action</span><span class="o">.</span><span class="n">errors</span><span class="p">,</span> <span class="ss">status</span><span class="p">:</span> <span class="ss">:unprocessable_entity</span> <span class="p">}</span>
+      <span class="k">end</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+
+  <span class="c1"># ...</span>
+<span class="k">end</span>
+</pre></div>
+
+
 <h2 id="bookrent">Book::Rent<a class="headerlink" href="#bookrent" title="Permanent link">&para;</a></h2>
 <p>The Rental system description says:</p>
 <ul>
@@ -901,7 +944,7 @@ And the action will decline the context to not be executed if it does not satisf
   <span class="kp">private</span>
 
   <span class="k">def</span> <span class="nf">execute_perform!</span><span class="p">(</span><span class="o">*</span><span class="p">)</span>
-    <span class="no">Rent</span><span class="o">.</span><span class="n">create!</span><span class="p">(</span><span class="ss">book</span><span class="p">:</span> <span class="n">subject</span><span class="p">,</span> <span class="ss">user</span><span class="p">:</span> <span class="n">performer</span><span class="p">)</span>
+    <span class="no">Rental</span><span class="o">.</span><span class="n">create!</span><span class="p">(</span><span class="ss">book</span><span class="p">:</span> <span class="n">subject</span><span class="p">,</span> <span class="ss">user</span><span class="p">:</span> <span class="n">performer</span><span class="p">)</span>
     <span class="n">subject</span><span class="o">.</span><span class="n">available</span> <span class="o">=</span> <span class="kp">false</span>
     <span class="n">subject</span><span class="o">.</span><span class="n">save!</span>
   <span class="k">end</span>
@@ -937,7 +980,7 @@ rented by this person:</p>
 <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">BA</span><span class="o">::</span><span class="no">Book</span><span class="o">::</span><span class="no">DeliverBack</span> <span class="o">&lt;</span> <span class="no">BA</span><span class="o">::</span><span class="no">Book</span><span class="o">::</span><span class="no">BusinessAction</span>
   <span class="n">precondition</span> <span class="k">do</span>
     <span class="n">rental_conditions</span> <span class="o">=</span> <span class="p">{</span> <span class="ss">book</span><span class="p">:</span> <span class="n">subject</span><span class="p">,</span> <span class="ss">user</span><span class="p">:</span> <span class="n">performer</span><span class="p">,</span> <span class="ss">delivered_back_at</span><span class="p">:</span> <span class="kp">nil</span> <span class="p">}</span>
-    <span class="no">Rent</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">rental_conditions</span><span class="p">)</span><span class="o">.</span><span class="n">exists?</span>
+    <span class="no">Rental</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">rental_conditions</span><span class="p">)</span><span class="o">.</span><span class="n">exists?</span>
   <span class="k">end</span>
 <span class="k">end</span>
 </pre></div>
@@ -945,32 +988,161 @@ rented by this person:</p>
 
 <p>The logic of the deliver back, we just need to pick the current rental and
 assign the <code>delivered_back_at</code> date. Also, make the book available again.</p>
-<div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">BA</span><span class="o">::</span><span class="no">Book</span><span class="o">::</span><span class="no">DeliverBack</span> <span class="o">&lt;</span> <span class="no">BA</span><span class="o">::</span><span class="no">Book</span><span class="o">::</span><span class="no">BusinessAction</span>
-  <span class="n">precondition</span> <span class="k">do</span>
-    <span class="no">Rent</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">rental_conditions</span><span class="p">)</span><span class="o">.</span><span class="n">exists?</span>
-  <span class="k">end</span>
+<p>Let's start by testing the preconditions and guarantee that only the user that
+rent the book can deliver it back.</p>
+<div class="codehilite"><pre><span></span><span class="no">RSpec</span><span class="o">.</span><span class="n">describe</span> <span class="no">BA</span><span class="o">::</span><span class="no">Book</span><span class="o">::</span><span class="no">DeliverBack</span> <span class="k">do</span>
+  <span class="n">subject</span><span class="p">(</span><span class="ss">:action</span><span class="p">)</span> <span class="p">{</span> <span class="n">described_class</span><span class="o">.</span><span class="n">as</span><span class="p">(</span><span class="n">performer</span><span class="p">)</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">book</span><span class="p">)</span> <span class="p">}</span>
 
-  <span class="kp">private</span>
+  <span class="n">let</span><span class="p">(</span><span class="ss">:book</span><span class="p">)</span> <span class="p">{</span> <span class="no">Book</span><span class="o">.</span><span class="n">create!</span> <span class="ss">title</span><span class="p">:</span> <span class="s1">&#39;Learn to fly&#39;</span><span class="p">,</span> <span class="ss">available</span><span class="p">:</span> <span class="kp">true</span> <span class="p">}</span>
+  <span class="n">let</span><span class="p">(</span><span class="ss">:performer</span><span class="p">)</span> <span class="p">{</span> <span class="no">User</span><span class="o">.</span><span class="n">create!</span> <span class="p">}</span>
 
-  <span class="k">def</span> <span class="nf">execute_perform!</span><span class="p">(</span><span class="o">*</span><span class="p">)</span>
-    <span class="n">rent</span><span class="o">.</span><span class="n">delivered_back_at</span> <span class="o">=</span> <span class="no">Time</span><span class="o">.</span><span class="n">now</span>
-    <span class="n">rent</span><span class="o">.</span><span class="n">save!</span>
+  <span class="n">describe</span> <span class="s1">&#39;preconditions&#39;</span> <span class="k">do</span>
+    <span class="n">context</span> <span class="s1">&#39;when the user rented the book&#39;</span> <span class="k">do</span>
+      <span class="n">before</span> <span class="p">{</span> <span class="no">BA</span><span class="o">::</span><span class="no">Book</span><span class="o">::</span><span class="no">Rent</span><span class="o">.</span><span class="n">as</span><span class="p">(</span><span class="n">performer</span><span class="p">)</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">book</span><span class="p">)</span><span class="o">.</span><span class="n">perform!</span> <span class="p">}</span>
+      <span class="n">it</span> <span class="p">{</span> <span class="n">is_expected</span><span class="o">.</span><span class="n">to</span> <span class="n">be_satisfy_preconditions</span> <span class="p">}</span>
+    <span class="k">end</span>
 
-    <span class="n">subject</span><span class="o">.</span><span class="n">available</span> <span class="o">=</span> <span class="kp">true</span>
-    <span class="n">subject</span><span class="o">.</span><span class="n">save!</span>
-  <span class="k">end</span>
-
-  <span class="k">def</span> <span class="nf">rent</span>
-    <span class="vi">@rent</span> <span class="o">||=</span> <span class="no">Rent</span><span class="o">.</span><span class="n">find_by</span><span class="p">(</span><span class="n">rental_conditions</span><span class="p">)</span>
-  <span class="k">end</span>
-
-  <span class="k">def</span> <span class="nf">rental_conditions</span>
-    <span class="p">{</span> <span class="ss">book</span><span class="p">:</span> <span class="n">subject</span><span class="p">,</span> <span class="ss">user</span><span class="p">:</span> <span class="n">performer</span><span class="p">,</span> <span class="ss">delivered_back_at</span><span class="p">:</span> <span class="kp">nil</span> <span class="p">}</span>
+    <span class="n">context</span> <span class="s1">&#39;when preconditions fail&#39;</span> <span class="k">do</span>
+      <span class="n">it</span> <span class="p">{</span> <span class="n">is_expected</span><span class="o">.</span><span class="n">not_to</span> <span class="n">be_satisfy_preconditions</span> <span class="p">}</span>
+    <span class="k">end</span>
   <span class="k">end</span>
 <span class="k">end</span>
 </pre></div>
 
 
+<p>And implementing the preconditions:</p>
+<div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">BA</span><span class="o">::</span><span class="no">Book</span><span class="o">::</span><span class="no">DeliverBack</span> <span class="o">&lt;</span> <span class="no">BA</span><span class="o">::</span><span class="no">Book</span><span class="o">::</span><span class="no">BusinessAction</span>
+
+  <span class="n">subject</span> <span class="ss">:book</span>
+  <span class="n">allow_if</span> <span class="p">{</span> <span class="n">performer</span><span class="o">.</span><span class="n">is_a?</span><span class="p">(</span><span class="no">User</span><span class="p">)</span> <span class="p">}</span>
+
+  <span class="n">precondition</span> <span class="k">do</span>
+    <span class="n">decline_with</span><span class="p">(</span><span class="ss">:not_renting</span><span class="p">)</span> <span class="k">unless</span> <span class="n">performer</span><span class="o">.</span><span class="n">renting?</span><span class="p">(</span><span class="n">book</span><span class="p">)</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</pre></div>
+
+
+<p>And the <code>User</code> now have a few scopes and the <code>#renting?</code> method:</p>
+<div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">User</span> <span class="o">&lt;</span> <span class="no">ApplicationRecord</span>
+  <span class="n">devise</span> <span class="ss">:database_authenticatable</span><span class="p">,</span> <span class="ss">:registerable</span>
+  <span class="n">has_many</span> <span class="ss">:rentals</span>
+  <span class="n">has_many</span> <span class="ss">:books</span><span class="p">,</span> <span class="ss">through</span><span class="p">:</span> <span class="ss">:rents</span>
+
+  <span class="k">def</span> <span class="nf">renting?</span><span class="p">(</span><span class="n">book</span><span class="p">)</span>
+    <span class="n">rentals</span><span class="o">.</span><span class="n">current</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="nb">id</span><span class="p">:</span> <span class="n">book</span><span class="o">.</span><span class="n">id</span><span class="p">)</span><span class="o">.</span><span class="n">exists?</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</pre></div>
+
+
+<p>Now implementing the spec that covers the logic of deliver back, is expected to
+make the book available and mark the rental with the delivered date.</p>
+<div class="codehilite"><pre><span></span><span class="no">RSpec</span><span class="o">.</span><span class="n">describe</span> <span class="no">BA</span><span class="o">::</span><span class="no">Book</span><span class="o">::</span><span class="no">DeliverBack</span> <span class="k">do</span>
+  <span class="n">subject</span><span class="p">(</span><span class="ss">:action</span><span class="p">)</span> <span class="p">{</span> <span class="n">described_class</span><span class="o">.</span><span class="n">as</span><span class="p">(</span><span class="n">performer</span><span class="p">)</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">book</span><span class="p">)</span> <span class="p">}</span>
+
+  <span class="n">let</span><span class="p">(</span><span class="ss">:book</span><span class="p">)</span> <span class="p">{</span> <span class="no">Book</span><span class="o">.</span><span class="n">create!</span> <span class="ss">title</span><span class="p">:</span> <span class="s1">&#39;Learn to fly&#39;</span><span class="p">,</span> <span class="ss">available</span><span class="p">:</span> <span class="kp">true</span> <span class="p">}</span>
+  <span class="n">let</span><span class="p">(</span><span class="ss">:performer</span><span class="p">)</span> <span class="p">{</span> <span class="no">User</span><span class="o">.</span><span class="n">create!</span> <span class="p">}</span>
+
+  <span class="c1"># describe &#39;preconditions&#39; ...</span>
+
+  <span class="n">describe</span> <span class="s1">&#39;#perform!&#39;</span> <span class="k">do</span>
+    <span class="n">let!</span><span class="p">(</span><span class="ss">:rental</span><span class="p">)</span> <span class="p">{</span> <span class="no">BA</span><span class="o">::</span><span class="no">Book</span><span class="o">::</span><span class="no">Rent</span><span class="o">.</span><span class="n">as</span><span class="p">(</span><span class="n">performer</span><span class="p">)</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">book</span><span class="p">)</span><span class="o">.</span><span class="n">perform!</span> <span class="p">}</span>
+
+    <span class="n">specify</span> <span class="k">do</span>
+      <span class="n">expect</span> <span class="p">{</span> <span class="n">action</span><span class="o">.</span><span class="n">perform!</span> <span class="p">}</span>
+        <span class="o">.</span><span class="n">to</span> <span class="n">change</span> <span class="p">{</span> <span class="n">book</span><span class="o">.</span><span class="n">reload</span><span class="o">.</span><span class="n">available</span> <span class="p">}</span><span class="o">.</span><span class="n">from</span><span class="p">(</span><span class="kp">false</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="kp">true</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">and</span> <span class="n">change</span> <span class="p">{</span> <span class="n">rental</span><span class="o">.</span><span class="n">reload</span><span class="o">.</span><span class="n">delivered_back_at</span> <span class="p">}</span><span class="o">.</span><span class="n">from</span><span class="p">(</span><span class="kp">nil</span><span class="p">)</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</pre></div>
+
+
+<p>A last step to make it user friendly is add a key to return a personalized
+message when the business action calls <code>decline_with(:unavailable)</code>.</p>
+<p>It's time to create <code>config/locales/granite.en.yml</code> file:</p>
+<div class="codehilite"><pre><span></span>en:
+  granite_action:
+    errors:
+      models:
+        ba/book/rent:
+          attributes:
+            base:
+              unavailable: &#39;The book is unavailable.&#39;
+</pre></div>
+
+
+<p>Great! Now it's time to change our views to allow people to interact with the
+actions we created.</p>
+<p>First, we need to add controller methods to call the <code>Rent</code> and <code>DeliverBack</code>
+business actions and create routes for it.</p>
+<div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">BooksController</span> <span class="o">&lt;</span> <span class="no">ApplicationController</span>
+
+  <span class="c1"># a few other scaffold methods here...</span>
+
+  <span class="c1"># POST /books/1/rent</span>
+  <span class="k">def</span> <span class="nf">rent</span>
+    <span class="vi">@book</span> <span class="o">=</span> <span class="no">Book</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">params</span><span class="o">[</span><span class="ss">:book_id</span><span class="o">]</span><span class="p">)</span>
+    <span class="n">book_action</span> <span class="o">=</span> <span class="no">BA</span><span class="o">::</span><span class="no">Book</span><span class="o">::</span><span class="no">Rent</span><span class="o">.</span><span class="n">as</span><span class="p">(</span><span class="n">current_user</span><span class="p">)</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="vi">@book</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">book_action</span><span class="o">.</span><span class="n">perform</span>
+      <span class="n">redirect_to</span> <span class="n">books_url</span><span class="p">,</span> <span class="ss">notice</span><span class="p">:</span> <span class="s1">&#39;Book was successfully rented.&#39;</span>
+    <span class="k">else</span>
+      <span class="n">redirect_to</span> <span class="n">books_url</span><span class="p">,</span> <span class="ss">alert</span><span class="p">:</span>  <span class="n">book_action</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">full_messages</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+
+  <span class="c1"># POST /books/1/deliver_back</span>
+  <span class="k">def</span> <span class="nf">deliver_back</span>
+    <span class="vi">@book</span> <span class="o">=</span> <span class="no">Book</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">params</span><span class="o">[</span><span class="ss">:book_id</span><span class="o">]</span><span class="p">)</span>
+    <span class="n">book_action</span> <span class="o">=</span> <span class="no">BA</span><span class="o">::</span><span class="no">Book</span><span class="o">::</span><span class="no">DeliverBack</span><span class="o">.</span><span class="n">as</span><span class="p">(</span><span class="n">current_user</span><span class="p">)</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="vi">@book</span><span class="p">)</span>
+      <span class="k">if</span> <span class="n">book_action</span><span class="o">.</span><span class="n">perform</span>
+        <span class="n">redirect_to</span> <span class="n">books_url</span><span class="p">,</span> <span class="ss">notice</span><span class="p">:</span> <span class="s1">&#39;Thanks for delivering it back.&#39;</span>
+      <span class="k">else</span>
+        <span class="n">redirect_to</span> <span class="n">books_url</span><span class="p">,</span> <span class="ss">alert</span><span class="p">:</span>  <span class="n">book_action</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">full_messages</span>
+      <span class="k">end</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</pre></div>
+
+
+<p>And add routes for <code>rent</code> and <code>deliver_back</code> in <code>config/routes.rb</code>:</p>
+<div class="codehilite"><pre><span></span>  <span class="n">resources</span> <span class="ss">:books</span> <span class="k">do</span>
+    <span class="n">post</span> <span class="ss">:rent</span>
+    <span class="n">post</span> <span class="ss">:deliver_back</span>
+  <span class="k">end</span>
+</pre></div>
+
+
+<p>Now, it's time to change the current view to add such actions:</p>
+<div class="codehilite"><pre><span></span><span class="x">  &lt;tbody&gt;</span>
+<span class="x">    </span><span class="cp">&lt;%</span> <span class="vi">@books</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">book</span><span class="o">|</span> <span class="cp">%&gt;</span><span class="x"></span>
+<span class="x">      &lt;tr&gt;</span>
+<span class="x">        &lt;td&gt;</span><span class="cp">&lt;%=</span> <span class="n">book</span><span class="o">.</span><span class="n">title</span> <span class="cp">%&gt;</span><span class="x">&lt;/td&gt;</span>
+<span class="x">        </span><span class="cp">&lt;%</span> <span class="k">if</span> <span class="n">book</span><span class="o">.</span><span class="n">available?</span> <span class="cp">%&gt;</span><span class="x"></span>
+<span class="x">          &lt;td&gt;</span><span class="cp">&lt;%=</span> <span class="n">link_to</span> <span class="s1">&#39;Rent&#39;</span><span class="p">,</span> <span class="n">book_rent_path</span><span class="p">(</span><span class="n">book</span><span class="p">),</span> <span class="nb">method</span><span class="p">:</span> <span class="ss">:post</span><span class="p">,</span> <span class="ss">data</span><span class="p">:</span> <span class="p">{</span> <span class="ss">confirm</span><span class="p">:</span> <span class="s1">&#39;Rent this book?&#39;</span> <span class="p">}</span>  <span class="cp">%&gt;</span><span class="x">&lt;/td&gt;</span>
+<span class="x">        </span><span class="cp">&lt;%</span> <span class="k">else</span> <span class="cp">%&gt;</span><span class="x"></span>
+<span class="x">          &lt;td&gt;(Rented)&lt;/td&gt;</span>
+<span class="x">        </span><span class="cp">&lt;%</span> <span class="k">end</span> <span class="cp">%&gt;</span><span class="x"></span>
+<span class="x">        </span><span class="cp">&lt;%</span> <span class="k">if</span> <span class="n">current_user</span> <span class="o">&amp;&amp;</span> <span class="n">current_user</span><span class="o">.</span><span class="n">renting?</span><span class="p">(</span><span class="n">book</span><span class="p">)</span> <span class="cp">%&gt;</span><span class="x"></span>
+<span class="x">           &lt;td&gt;</span><span class="cp">&lt;%=</span> <span class="n">link_to</span> <span class="s1">&#39;Deliver back&#39;</span><span class="p">,</span> <span class="n">book_deliver_back_path</span><span class="p">(</span><span class="n">book</span><span class="p">),</span> <span class="nb">method</span><span class="p">:</span> <span class="ss">:post</span><span class="p">,</span> <span class="ss">data</span><span class="p">:</span> <span class="p">{</span> <span class="ss">confirm</span><span class="p">:</span> <span class="s1">&#39;Are you delivering this book back?&#39;</span> <span class="p">}</span>  <span class="cp">%&gt;</span><span class="x">&lt;/td&gt;</span>
+<span class="x">        </span><span class="cp">&lt;%</span> <span class="k">end</span> <span class="cp">%&gt;</span><span class="x"></span>
+<span class="x">        &lt;td&gt;</span><span class="cp">&lt;%=</span> <span class="n">link_to</span> <span class="s1">&#39;Show&#39;</span><span class="p">,</span> <span class="n">book</span> <span class="cp">%&gt;</span><span class="x">&lt;/td&gt;</span>
+<span class="x">        &lt;td&gt;</span><span class="cp">&lt;%=</span> <span class="n">link_to</span> <span class="s1">&#39;Edit&#39;</span><span class="p">,</span> <span class="n">edit_book_path</span><span class="p">(</span><span class="n">book</span><span class="p">)</span> <span class="cp">%&gt;</span><span class="x">&lt;/td&gt;</span>
+<span class="x">        &lt;td&gt;</span><span class="cp">&lt;%=</span> <span class="n">link_to</span> <span class="s1">&#39;Destroy&#39;</span><span class="p">,</span> <span class="n">book</span><span class="p">,</span> <span class="nb">method</span><span class="p">:</span> <span class="ss">:delete</span><span class="p">,</span> <span class="ss">data</span><span class="p">:</span> <span class="p">{</span> <span class="ss">confirm</span><span class="p">:</span> <span class="s1">&#39;Do you really want to destroy this book?&#39;</span> <span class="p">}</span> <span class="cp">%&gt;</span><span class="x">&lt;/td&gt;</span>
+<span class="x">      &lt;/tr&gt;</span>
+<span class="x">    </span><span class="cp">&lt;%</span> <span class="k">end</span> <span class="cp">%&gt;</span><span class="x"></span>
+<span class="x">  &lt;/tbody&gt;</span>
+</pre></div>
+
+
+<p>Now is a good opportunity to introduce <a href="../projectors/">projectors</a>.</p>
+<p>Look that we have a few boilerplate code in the controller that make us repeat a
+few different logics that are already declared in the business action.</p>
+<p>Projectors can help with that. Avoiding the need of creating repetivive
+controller methods and reverify preconditions and policies to decide what
+actions can be executed.</p>
 <h2 id="wishlistadd">Wishlist::Add<a class="headerlink" href="#wishlistadd" title="Permanent link">&para;</a></h2>
 <h2 id="wishlistremove">Wishlist::Remove<a class="headerlink" href="#wishlistremove" title="Permanent link">&para;</a></h2>
 <h2 id="wishlistnotifyavailability">Wishlist::NotifyAvailability<a class="headerlink" href="#wishlistnotifyavailability" title="Permanent link">&para;</a></h2>
