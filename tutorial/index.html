@@ -408,6 +408,40 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#i18n" title="I18n" class="md-nav__link">
+    I18n
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#setup-view-context-for-granite-projector" title="Setup view context for Granite projector" class="md-nav__link">
+    Setup view context for Granite projector
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#inline-projector" title="Inline projector" class="md-nav__link">
+    Inline projector
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#projector-helpers" title="Projector Helpers" class="md-nav__link">
+    Projector Helpers
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#wishlistadd" title="Wishlist::Add" class="md-nav__link">
     Wishlist::Add
   </a>
@@ -570,6 +604,40 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#i18n" title="I18n" class="md-nav__link">
+    I18n
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#setup-view-context-for-granite-projector" title="Setup view context for Granite projector" class="md-nav__link">
+    Setup view context for Granite projector
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#inline-projector" title="Inline projector" class="md-nav__link">
+    Inline projector
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#projector-helpers" title="Projector Helpers" class="md-nav__link">
+    Projector Helpers
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#wishlistadd" title="Wishlist::Add" class="md-nav__link">
     Wishlist::Add
   </a>
@@ -665,7 +733,7 @@ users. Adding it to <code>Gemfile</code>.</p>
 </pre></div>
 
 
-<p>Now, use bundle install to </p>
+<p>Run <code>bundle install</code> and then generate the default devise resources.</p>
 <div class="codehilite"><pre><span></span>rails generate devise:install
 </pre></div>
 
@@ -860,18 +928,13 @@ call.</p>
   <span class="c1"># ...</span>
 
   <span class="c1"># POST /books</span>
-  <span class="c1"># POST /books.json</span>
   <span class="k">def</span> <span class="nf">create</span>
     <span class="n">book_action</span> <span class="o">=</span> <span class="no">BA</span><span class="o">::</span><span class="no">Book</span><span class="o">::</span><span class="no">Create</span><span class="o">.</span><span class="n">as</span><span class="p">(</span><span class="n">current_user</span><span class="p">)</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">book_params</span><span class="p">)</span>
-
-    <span class="n">respond_to</span> <span class="k">do</span> <span class="o">|</span><span class="nb">format</span><span class="o">|</span>
       <span class="k">if</span> <span class="n">book_action</span><span class="o">.</span><span class="n">perform</span>
-        <span class="nb">format</span><span class="o">.</span><span class="n">html</span> <span class="p">{</span> <span class="n">redirect_to</span> <span class="n">book_action</span><span class="o">.</span><span class="n">subject</span><span class="p">,</span> <span class="ss">notice</span><span class="p">:</span> <span class="s1">&#39;Book was successfully created.&#39;</span> <span class="p">}</span>
-        <span class="nb">format</span><span class="o">.</span><span class="n">json</span> <span class="p">{</span> <span class="n">render</span> <span class="ss">:show</span><span class="p">,</span> <span class="ss">status</span><span class="p">:</span> <span class="ss">:created</span><span class="p">,</span> <span class="ss">location</span><span class="p">:</span> <span class="n">book_action</span><span class="o">.</span><span class="n">subject</span> <span class="p">}</span>
+        <span class="n">redirect_to</span> <span class="n">book_action</span><span class="o">.</span><span class="n">subject</span><span class="p">,</span> <span class="ss">notice</span><span class="p">:</span> <span class="s1">&#39;Book was successfully created.&#39;</span>
       <span class="k">else</span>
         <span class="vi">@book</span> <span class="o">=</span> <span class="n">book_action</span><span class="o">.</span><span class="n">subject</span>
-        <span class="nb">format</span><span class="o">.</span><span class="n">html</span> <span class="p">{</span> <span class="n">render</span> <span class="ss">:new</span> <span class="p">}</span>
-        <span class="nb">format</span><span class="o">.</span><span class="n">json</span> <span class="p">{</span> <span class="n">render</span> <span class="ss">json</span><span class="p">:</span> <span class="n">book_action</span><span class="o">.</span><span class="n">errors</span><span class="p">,</span> <span class="ss">status</span><span class="p">:</span> <span class="ss">:unprocessable_entity</span> <span class="p">}</span>
+        <span class="n">render</span> <span class="ss">:new</span>
       <span class="k">end</span>
     <span class="k">end</span>
   <span class="k">end</span>
@@ -1030,7 +1093,7 @@ rent the book can deliver it back.</p>
   <span class="n">has_many</span> <span class="ss">:books</span><span class="p">,</span> <span class="ss">through</span><span class="p">:</span> <span class="ss">:rents</span>
 
   <span class="k">def</span> <span class="nf">renting?</span><span class="p">(</span><span class="n">book</span><span class="p">)</span>
-    <span class="n">rentals</span><span class="o">.</span><span class="n">current</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="nb">id</span><span class="p">:</span> <span class="n">book</span><span class="o">.</span><span class="n">id</span><span class="p">)</span><span class="o">.</span><span class="n">exists?</span>
+    <span class="n">rentals</span><span class="o">.</span><span class="n">current</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="ss">book_id</span><span class="p">:</span> <span class="n">book</span><span class="o">.</span><span class="n">id</span><span class="p">)</span><span class="o">.</span><span class="n">exists?</span>
   <span class="k">end</span>
 <span class="k">end</span>
 </pre></div>
@@ -1059,6 +1122,7 @@ make the book available and mark the rental with the delivered date.</p>
 </pre></div>
 
 
+<h2 id="i18n">I18n<a class="headerlink" href="#i18n" title="Permanent link">&para;</a></h2>
 <p>A last step to make it user friendly is add a key to return a personalized
 message when the business action calls <code>decline_with(:unavailable)</code>.</p>
 <p>It's time to create <code>config/locales/granite.en.yml</code> file:</p>
@@ -1121,12 +1185,12 @@ business actions and create routes for it.</p>
 <span class="x">      &lt;tr&gt;</span>
 <span class="x">        &lt;td&gt;</span><span class="cp">&lt;%=</span> <span class="n">book</span><span class="o">.</span><span class="n">title</span> <span class="cp">%&gt;</span><span class="x">&lt;/td&gt;</span>
 <span class="x">        </span><span class="cp">&lt;%</span> <span class="k">if</span> <span class="n">book</span><span class="o">.</span><span class="n">available?</span> <span class="cp">%&gt;</span><span class="x"></span>
-<span class="x">          &lt;td&gt;</span><span class="cp">&lt;%=</span> <span class="n">link_to</span> <span class="s1">&#39;Rent&#39;</span><span class="p">,</span> <span class="n">book_rent_path</span><span class="p">(</span><span class="n">book</span><span class="p">),</span> <span class="nb">method</span><span class="p">:</span> <span class="ss">:post</span><span class="p">,</span> <span class="ss">data</span><span class="p">:</span> <span class="p">{</span> <span class="ss">confirm</span><span class="p">:</span> <span class="s1">&#39;Rent this book?&#39;</span> <span class="p">}</span>  <span class="cp">%&gt;</span><span class="x">&lt;/td&gt;</span>
+<span class="x">          &lt;td&gt;</span><span class="cp">&lt;%=</span> <span class="n">link_to</span> <span class="s1">&#39;Rent&#39;</span><span class="p">,</span> <span class="n">rent_book_path</span><span class="p">(</span><span class="n">book</span><span class="p">),</span> <span class="nb">method</span><span class="p">:</span> <span class="ss">:post</span> <span class="cp">%&gt;</span><span class="x">&lt;/td&gt;</span>
 <span class="x">        </span><span class="cp">&lt;%</span> <span class="k">else</span> <span class="cp">%&gt;</span><span class="x"></span>
 <span class="x">          &lt;td&gt;(Rented)&lt;/td&gt;</span>
 <span class="x">        </span><span class="cp">&lt;%</span> <span class="k">end</span> <span class="cp">%&gt;</span><span class="x"></span>
 <span class="x">        </span><span class="cp">&lt;%</span> <span class="k">if</span> <span class="n">current_user</span> <span class="o">&amp;&amp;</span> <span class="n">current_user</span><span class="o">.</span><span class="n">renting?</span><span class="p">(</span><span class="n">book</span><span class="p">)</span> <span class="cp">%&gt;</span><span class="x"></span>
-<span class="x">           &lt;td&gt;</span><span class="cp">&lt;%=</span> <span class="n">link_to</span> <span class="s1">&#39;Deliver back&#39;</span><span class="p">,</span> <span class="n">book_deliver_back_path</span><span class="p">(</span><span class="n">book</span><span class="p">),</span> <span class="nb">method</span><span class="p">:</span> <span class="ss">:post</span><span class="p">,</span> <span class="ss">data</span><span class="p">:</span> <span class="p">{</span> <span class="ss">confirm</span><span class="p">:</span> <span class="s1">&#39;Are you delivering this book back?&#39;</span> <span class="p">}</span>  <span class="cp">%&gt;</span><span class="x">&lt;/td&gt;</span>
+<span class="x">           &lt;td&gt;</span><span class="cp">&lt;%=</span> <span class="n">link_to</span> <span class="s1">&#39;Deliver back&#39;</span><span class="p">,</span> <span class="n">deliver_back_book_path</span><span class="p">(</span><span class="n">book</span><span class="p">),</span> <span class="nb">method</span><span class="p">:</span> <span class="ss">:post</span> <span class="cp">%&gt;</span><span class="x">&lt;/td&gt;</span>
 <span class="x">        </span><span class="cp">&lt;%</span> <span class="k">end</span> <span class="cp">%&gt;</span><span class="x"></span>
 <span class="x">        &lt;td&gt;</span><span class="cp">&lt;%=</span> <span class="n">link_to</span> <span class="s1">&#39;Show&#39;</span><span class="p">,</span> <span class="n">book</span> <span class="cp">%&gt;</span><span class="x">&lt;/td&gt;</span>
 <span class="x">        &lt;td&gt;</span><span class="cp">&lt;%=</span> <span class="n">link_to</span> <span class="s1">&#39;Edit&#39;</span><span class="p">,</span> <span class="n">edit_book_path</span><span class="p">(</span><span class="n">book</span><span class="p">)</span> <span class="cp">%&gt;</span><span class="x">&lt;/td&gt;</span>
@@ -1143,6 +1207,195 @@ few different logics that are already declared in the business action.</p>
 <p>Projectors can help with that. Avoiding the need of creating repetivive
 controller methods and reverify preconditions and policies to decide what
 actions can be executed.</p>
+<h3 id="setup-view-context-for-granite-projector">Setup view context for Granite projector<a class="headerlink" href="#setup-view-context-for-granite-projector" title="Permanent link">&para;</a></h3>
+<p>You'll need to setup the master controller class. Let's create a file to setup
+it:</p>
+<p><code>config/initializers/granite.rb</code></p>
+<div class="codehilite"><pre><span></span><span class="no">Granite</span><span class="o">.</span><span class="n">tap</span> <span class="k">do</span> <span class="o">|</span><span class="n">m</span><span class="o">|</span>
+  <span class="n">m</span><span class="o">.</span><span class="n">base_controller</span> <span class="o">=</span> <span class="s1">&#39;ApplicationController&#39;</span>
+<span class="k">end</span>
+</pre></div>
+
+
+<p>The next step is setup granite in the <code>ApplicationController</code> to setup context
+view and allow granite to inherit behavior from it.</p>
+<p><code>app/controllers/application_controller</code></p>
+<div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">ApplicationController</span> <span class="o">&lt;</span> <span class="no">ActionController</span><span class="o">::</span><span class="no">Base</span>
+  <span class="n">protect_from_forgery</span> <span class="ss">with</span><span class="p">:</span> <span class="ss">:exception</span>
+  <span class="n">around_action</span> <span class="ss">:setup_granite_view_context</span>
+  <span class="n">before_action</span> <span class="p">{</span> <span class="n">view_context</span> <span class="p">}</span>
+
+  <span class="kp">protected</span>
+  <span class="k">def</span> <span class="nf">setup_granite_view_context</span><span class="p">(</span><span class="o">&amp;</span><span class="n">block</span><span class="p">)</span>
+    <span class="no">Granite</span><span class="o">.</span><span class="n">with_view_context</span><span class="p">(</span><span class="n">view_context</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">block</span><span class="p">)</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</pre></div>
+
+
+<h2 id="inline-projector">Inline projector<a class="headerlink" href="#inline-projector" title="Permanent link">&para;</a></h2>
+<p>The current <code>rent</code> and <code>delivered_back</code> methods have a very similar structure.</p>
+<p>And the projectors allows to simply declare the HTTP method like <code>get</code> or
+<code>post</code> and mount it in a route as an anonymous controller.</p>
+<p>Inside the block, the action is already set with all parameters from the web
+request and ready to be executed.</p>
+<p>As the current controller actions are executed with POST, let's follow in the same line and
+create a simple projector that allows to receive some post data and redirect to the resources list back.</p>
+<p>The projector will have a default <code>success_redirect</code> and <code>failure_redirect</code> after perform the action.
+By default, let's assume that we'll redirect it to the collection and render a
+positive notice or a negative alert about the previous action.</p>
+<div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">InlineProjector</span> <span class="o">&lt;</span> <span class="no">Granite</span><span class="o">::</span><span class="no">Projector</span>
+
+  <span class="n">post</span> <span class="ss">:perform</span><span class="p">,</span> <span class="ss">as</span><span class="p">:</span> <span class="s1">&#39;&#39;</span> <span class="k">do</span>
+    <span class="k">if</span> <span class="n">action</span><span class="o">.</span><span class="n">perform!</span>
+      <span class="n">redirect_to</span> <span class="n">projector</span><span class="o">.</span><span class="n">success_redirect</span><span class="p">,</span> <span class="ss">notice</span><span class="p">:</span> <span class="n">t</span><span class="p">(</span><span class="s1">&#39;.notice&#39;</span><span class="p">)</span>
+    <span class="k">else</span>
+      <span class="n">messages</span> <span class="o">=</span> <span class="n">projector</span><span class="o">.</span><span class="n">action</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">full_messages</span><span class="o">.</span><span class="n">to_sentence</span>
+      <span class="n">redirect_to</span> <span class="n">projector</span><span class="o">.</span><span class="n">failure_redirect</span><span class="p">,</span> <span class="ss">alert</span><span class="p">:</span>  <span class="n">t</span><span class="p">(</span><span class="s1">&#39;.error&#39;</span><span class="p">,</span> <span class="n">messages</span><span class="p">)</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">collection_subject</span>
+    <span class="n">action</span><span class="o">.</span><span class="n">subject</span><span class="o">.</span><span class="n">class</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">downcase</span><span class="o">.</span><span class="n">pluralize</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">success_redirect</span>
+    <span class="n">h</span><span class="o">.</span><span class="n">public_send</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">#{</span><span class="n">collection_subject</span><span class="si">}</span><span class="s2">_path&quot;</span><span class="p">)</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">build_action</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
+    <span class="n">action_class</span><span class="o">.</span><span class="n">as</span><span class="p">(</span><span class="nb">self</span><span class="o">.</span><span class="n">class</span><span class="o">.</span><span class="n">proxy_performer</span> <span class="o">||</span> <span class="n">h</span><span class="o">.</span><span class="n">current_user</span><span class="p">)</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</pre></div>
+
+
+<p>We also need to say who is the performer of the action.
+he <code>build_action</code> method in the projector is implemented to override the
+current performer in the action with the <code>current_role</code>.</p>
+<div class="admonition info">
+<p class="admonition-title">Info</p>
+<p>Note that <code>h</code> is an alias for <code>view_context</code> and you can access anything
+from the controller through it.</p>
+</div>
+<p>Now, it's time to say that we're going to use the projector inside the <code>Rent</code> action:</p>
+<p>File: <code>apq/actions/ba/book/rent.rb</code></p>
+<div class="codehilite"><pre><span></span>class BA::Book::Rent &lt; BaseAction
+  subject :book
+
+<span class="gi">+  projector :inline</span>
+
+  allow_if { performer.is_a?(User) }
+
+  precondition do
+    decline_with(:unavailable) unless book.available?
+  end
+
+  private
+
+  def execute_perform!(*)
+    subject.available = false
+    subject.save!
+    ::Rental.create!(book: subject, user: performer)
+  end
+end
+</pre></div>
+
+
+<p>And also drop the method from the <code>BooksController</code>:</p>
+<p>File: <code>app/controllers/books_controller.rb</code></p>
+<div class="codehilite"><pre><span></span><span class="gu">@@ -25,28 +25,6 @@ class BooksController &lt; ApplicationController</span>
+     @book = Book.find(params[:id])
+   end
+
+<span class="gd">-  # POST /books/1/rent</span>
+<span class="gd">-  def rent</span>
+<span class="gd">-    @book = Book.find(params[:book_id])</span>
+<span class="gd">-    book_action = BA::Book::Rent.as(current_user).new(@book)</span>
+<span class="gd">-    if book_action.perform</span>
+<span class="gd">-      redirect_to books_url, notice: &#39;Book was successfully rented.&#39;</span>
+<span class="gd">-    else</span>
+<span class="gd">-      redirect_to books_url, alert:  book_action.errors.full_messages.to_sentence</span>
+<span class="gd">-    end</span>
+<span class="gd">-  end</span>
+</pre></div>
+
+
+<p>As a last step we need to change the <code>config/routes.rb</code> to use the <code>granite</code>
+keyword to mount the <code>action#projector</code> into some route.</p>
+<p>File: <code>config/routes.rb</code></p>
+<div class="codehilite"><pre><span></span>Rails.application.routes.draw do
+  root &#39;books#index&#39;
+
+  devise_for :users
+
+  resources :books do
+<span class="gd">-   post :rent</span>
+<span class="gi">+   granite &#39;BA/book/rent#inline&#39;</span>
+    post :deliver_back
+  end
+end
+</pre></div>
+
+
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>As it's a tutorial, your next task is do the same for <code>deliver_back</code>.</p>
+<ol>
+<li>Add <code>projector :inline</code> to <code>BA::Book::DeliverBack</code> class.</li>
+<li>Remove the controller method</li>
+<li>Refactor the route declaring the <code>granite 'action#projector'</code></li>
+</ol>
+</div>
+<h2 id="projector-helpers">Projector Helpers<a class="headerlink" href="#projector-helpers" title="Permanent link">&para;</a></h2>
+<p>You can define useful methods for helping you rendering your view and improving
+the experience with your actions. Now, let's create a <code>button</code> function,
+to replace the action links in the current list.</p>
+<p>First, we need to have a method in our projector that can render the button if
+the action is performable.</p>
+<p>It will render nothing if the current user does not have access or it's an
+anonymous session.</p>
+<p>We'll render the action name striked if the action is not performable with the
+error messages in the title, because if people mouse over they can see the
+"tooltip" with why it's not possible to execute the action.</p>
+<div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">InlineProjector</span> <span class="o">&lt;</span> <span class="no">Granite</span><span class="o">::</span><span class="no">Projector</span>
+
+  <span class="c1"># ...</span>
+  <span class="c1"># The previous methods remains here</span>
+  <span class="c1"># ...</span>
+
+  <span class="k">def</span> <span class="nf">button</span><span class="p">(</span><span class="n">link_options</span> <span class="o">=</span> <span class="p">{})</span>
+    <span class="k">return</span> <span class="k">unless</span> <span class="n">action</span><span class="o">.</span><span class="n">allowed?</span>
+    <span class="k">if</span> <span class="n">action</span><span class="o">.</span><span class="n">performable?</span>
+      <span class="n">h</span><span class="o">.</span><span class="n">link_to</span> <span class="n">action_label</span><span class="p">,</span> <span class="n">perform_path</span><span class="p">,</span> <span class="nb">method</span><span class="p">:</span> <span class="ss">:post</span>
+    <span class="k">else</span>
+      <span class="n">h</span><span class="o">.</span><span class="n">content_tag</span><span class="p">(</span><span class="ss">:strike</span><span class="p">,</span> <span class="n">action_label</span><span class="p">,</span> <span class="ss">title</span><span class="p">:</span> <span class="n">action</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">full_messages</span><span class="o">.</span><span class="n">to_sentence</span><span class="p">)</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">action_label</span>
+    <span class="n">action</span><span class="o">.</span><span class="n">class</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">demodulize</span><span class="o">.</span><span class="n">underscore</span><span class="o">.</span><span class="n">humanize</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</pre></div>
+
+
+<p>And now, we can replace the links with the new <code>button</code> function:</p>
+<div class="codehilite"><pre><span></span><span class="x">  &lt;tbody&gt;</span>
+<span class="x">    </span><span class="cp">&lt;%</span> <span class="vi">@books</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">book</span><span class="o">|</span> <span class="cp">%&gt;</span><span class="x"></span>
+<span class="x">      &lt;tr&gt;</span>
+<span class="x">        &lt;td&gt;</span><span class="cp">&lt;%=</span> <span class="n">book</span><span class="o">.</span><span class="n">title</span> <span class="cp">%&gt;</span><span class="x">&lt;/td&gt;</span>
+<span class="x">        &lt;td&gt;</span><span class="cp">&lt;%=</span> <span class="no">Ba</span><span class="o">::</span><span class="no">Book</span><span class="o">::</span><span class="no">Rent</span><span class="o">.</span><span class="n">as</span><span class="p">(</span><span class="n">current_user</span><span class="p">)</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">book</span><span class="p">)</span><span class="o">.</span><span class="n">inline</span><span class="o">.</span><span class="n">button</span><span class="cp">%&gt;</span><span class="x">&lt;/td&gt;</span>
+<span class="x">        &lt;td&gt;</span><span class="cp">&lt;%=</span> <span class="no">Ba</span><span class="o">::</span><span class="no">Book</span><span class="o">::</span><span class="no">DeliverBack</span><span class="o">.</span><span class="n">as</span><span class="p">(</span><span class="n">current_user</span><span class="p">)</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">book</span><span class="p">)</span><span class="o">.</span><span class="n">inline</span><span class="o">.</span><span class="n">button</span><span class="cp">%&gt;</span><span class="x">&lt;/td&gt;</span>
+<span class="x">        &lt;td&gt;... more links here ...&lt;/td&gt;</span>
+<span class="x">      &lt;/tr&gt;</span>
+<span class="x">    </span><span class="cp">&lt;%</span> <span class="k">end</span> <span class="cp">%&gt;</span><span class="x"></span>
+<span class="x">  &lt;/tbody&gt;</span>
+</pre></div>
+
+
+<p>Now it's very clear and the "Deliver Back" link will appear only for the user
+that rented the book.</p>
 <h2 id="wishlistadd">Wishlist::Add<a class="headerlink" href="#wishlistadd" title="Permanent link">&para;</a></h2>
 <h2 id="wishlistremove">Wishlist::Remove<a class="headerlink" href="#wishlistremove" title="Permanent link">&para;</a></h2>
 <h2 id="wishlistnotifyavailability">Wishlist::NotifyAvailability<a class="headerlink" href="#wishlistnotifyavailability" title="Permanent link">&para;</a></h2>
