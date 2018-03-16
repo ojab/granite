@@ -333,8 +333,8 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#generating-new-project" title="Generating new project" class="md-nav__link">
-    Generating new project
+  <a href="#generating-a-new-project" title="Generating a new project" class="md-nav__link">
+    Generating a new project
   </a>
   
 </li>
@@ -529,8 +529,8 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#generating-new-project" title="Generating new project" class="md-nav__link">
-    Generating new project
+  <a href="#generating-a-new-project" title="Generating a new project" class="md-nav__link">
+    Generating a new project
   </a>
   
 </li>
@@ -678,13 +678,13 @@
                 
                 
                 <h1 id="application-example">Application example<a class="headerlink" href="#application-example" title="Permanent link">&para;</a></h1>
-<p>The business we're going to cover is very simple.</p>
-<p>We have a simple book library and we need to allow logged users to create new
+<p>The business we're going to cover is straightforward.
+It will be a book library, and we need to allow logged users to create new
 books and rent it.</p>
 <h2 id="book-library">Book library<a class="headerlink" href="#book-library" title="Permanent link">&para;</a></h2>
-<p>A symple system to track books. Each book has a title.</p>
+<p>A simple system to track books. Each book has a title.</p>
 <ul>
-<li>The books view is public</li>
+<li>The list of books is public</li>
 <li><strong>Only</strong> logged users can edit the books</li>
 <li>Logged users can <strong>edit</strong> or <strong>remove</strong> a book</li>
 </ul>
@@ -699,18 +699,18 @@ books and rent it.</p>
 <p>The logged user can manage a <strong>wishlist</strong> considering:</p>
 <ul>
 <li>When a book is <strong>not available</strong> and the user "<strong>didn't read</strong> it</li>
-<li>If the person <strong>already read</strong> the book, also **doesn't make sense add it in the wishlist</li>
-<li>When the book become available, the system should notify people that are with this book in the wishlist</li>
-<li>When the book is rented by someone that have the book in the wishlist, it should be removed after delivered back</li>
+<li>If the person <strong>already read</strong> the book, also **doesn't make sense add it to the wishlist</li>
+<li>When the book becomes available, the system should notify people that are with this book on the wishlist</li>
+<li>When the book is rented by someone that has the book on the wishlist, it should be removed after delivered back</li>
 </ul>
-<p>The application domain is very simple and we're going to build step by step
+<p>The application domain is very simple, and we're going to build step by step
 this small logic case to show how granite can be useful and abstract a few
 steps of your application.</p>
 <h2 id="new-project-setup">New project setup<a class="headerlink" href="#new-project-setup" title="Permanent link">&para;</a></h2>
 <p>We're testing here with Rails version x. The following example can be found
 here: https://github.com/toptal/example_granite_application</p>
-<h3 id="generating-new-project">Generating new project<a class="headerlink" href="#generating-new-project" title="Permanent link">&para;</a></h3>
-<p>This tutorial is using Rails version <code>5.1.4</code> and the first step is install it:</p>
+<h3 id="generating-a-new-project">Generating a new project<a class="headerlink" href="#generating-a-new-project" title="Permanent link">&para;</a></h3>
+<p>This tutorial is using Rails version <code>5.1.4</code>, and the first step is to install it:</p>
 <div class="codehilite"><pre><span></span>gem install rails -v<span class="o">=</span><span class="m">5</span>.1.4
 </pre></div>
 
@@ -727,7 +727,7 @@ here: https://github.com/toptal/example_granite_application</p>
 
 
 <h2 id="setup-devise">Setup devise<a class="headerlink" href="#setup-devise" title="Permanent link">&para;</a></h2>
-<p>Let's add devise to control users access and have a simple control under logged
+<p>Let's add devise to control users access and have a simple control over logged
 users. Adding it to <code>Gemfile</code>.</p>
 <div class="codehilite"><pre><span></span><span class="n">gem</span> <span class="s1">&#39;devise&#39;</span>
 </pre></div>
@@ -763,13 +763,13 @@ the <a href="../testing/">testing</a> section.</p>
 <a href="https://github.com/toptal/granite/issues/new">report an issue</a>.</p>
 </div>
 <h2 id="bookcreate">Book::Create<a class="headerlink" href="#bookcreate" title="Permanent link">&para;</a></h2>
-<p>It's time to create our first model and have some initial domain on it.</p>
+<p>It's time to create our first model and has some domain on it.</p>
 <p>Let's use a scaffold to have a starting point with the <code>Book</code> model:</p>
 <div class="codehilite"><pre><span></span>rails g scaffold book title:string
 </pre></div>
 
 
-<p>Now, we can start working in the first business action.</p>
+<p>Now, we can start working on the first business action.</p>
 <p>Let's generate the boilerplate business action class with Rails granite generator:</p>
 <div class="codehilite"><pre><span></span><span class="n">rails</span> <span class="n">g</span> <span class="n">granite</span> <span class="n">book</span><span class="o">/</span><span class="n">create</span>
 </pre></div>
@@ -792,7 +792,7 @@ the <a href="../testing/">testing</a> section.</p>
 </pre></div>
 
 
-<p>And also a default business action was added with the shared subject:</p>
+<p>And also a default business action was added to the shared subject:</p>
 <div class="codehilite"><pre><span></span>class BA::Book::BusinessAction &lt; BaseAction
   subject :book
 end
@@ -819,7 +819,7 @@ logged users. Let's replace this line to restrict the action only for logged use
   <span class="n">describe</span> <span class="s1">&#39;policies&#39;</span> <span class="k">do</span>
     <span class="n">it</span> <span class="p">{</span> <span class="n">is_expected</span><span class="o">.</span><span class="n">to</span> <span class="n">be_allowed</span> <span class="p">}</span>
 
-    <span class="n">context</span> <span class="s1">&#39;when user is not authorized&#39;</span> <span class="k">do</span>
+    <span class="n">context</span> <span class="s1">&#39;when the user is not authorized&#39;</span> <span class="k">do</span>
       <span class="n">let</span><span class="p">(</span><span class="ss">:performer</span><span class="p">)</span> <span class="p">{</span> <span class="n">double</span> <span class="p">}</span>
       <span class="n">it</span> <span class="p">{</span> <span class="n">is_expected</span><span class="o">.</span><span class="n">not_to</span> <span class="n">be_allowed</span> <span class="p">}</span>
     <span class="k">end</span>
@@ -829,7 +829,7 @@ logged users. Let's replace this line to restrict the action only for logged use
 
 
 <h2 id="attributes">Attributes<a class="headerlink" href="#attributes" title="Permanent link">&para;</a></h2>
-<p>We also need to be specific of what attributes this action can touch and then
+<p>We also need to be specific about what attributes this action can touch and then
 we need to define attributes for it:</p>
 <div class="codehilite"><pre><span></span><span class="c1"># apq/actions/ba/book/create.rb</span>
 <span class="k">class</span> <span class="nc">BA</span><span class="o">::</span><span class="no">Book</span><span class="o">::</span><span class="no">Create</span> <span class="o">&lt;</span> <span class="no">BA</span><span class="o">::</span><span class="no">Book</span><span class="o">::</span><span class="no">BusinessAction</span>
@@ -863,7 +863,7 @@ title:</p>
   <span class="n">describe</span> <span class="s1">&#39;policies&#39;</span> <span class="k">do</span>
     <span class="n">it</span> <span class="p">{</span> <span class="n">is_expected</span><span class="o">.</span><span class="n">to</span> <span class="n">be_allowed</span> <span class="p">}</span>
 
-    <span class="n">context</span> <span class="s1">&#39;when user is not authorized&#39;</span> <span class="k">do</span>
+    <span class="n">context</span> <span class="s1">&#39;when the user is not authorized&#39;</span> <span class="k">do</span>
       <span class="n">let</span><span class="p">(</span><span class="ss">:performer</span><span class="p">)</span> <span class="p">{</span> <span class="n">double</span> <span class="p">}</span>
       <span class="n">it</span> <span class="p">{</span> <span class="n">is_expected</span><span class="o">.</span><span class="n">not_to</span> <span class="n">be_allowed</span> <span class="p">}</span>
     <span class="k">end</span>
@@ -882,7 +882,7 @@ title:</p>
 
 
 <h2 id="perform">Perform<a class="headerlink" href="#perform" title="Permanent link">&para;</a></h2>
-<p>For now, the perform is a simple call to <code>book.save!</code> because granite already
+<p>For now, the perform is a simple call to <code>book.save!</code> because of granite already
 assign the attributes.</p>
 <p>Then we need to test if it's generating the right record:</p>
 <div class="codehilite"><pre><span></span><span class="nb">require</span> <span class="s1">&#39;rails_helper&#39;</span>
@@ -906,8 +906,8 @@ assign the attributes.</p>
 </pre></div>
 
 
-<p>The last step is replace the current book creation in the controller to call
-the BA instead.</p>
+<p>The last step is to replace the current book creation in the controller to call
+the business action instead.</p>
 <p>First thing is rescue from Granite::NotAllowed when some action is not allowed
 to be executed.</p>
 <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">BooksController</span> <span class="o">&lt;</span> <span class="no">ApplicationController</span>
@@ -919,10 +919,8 @@ to be executed.</p>
 </pre></div>
 
 
-<p>It will generically manage exceptions case some unauthorized user try to
-force performing an action without having access.</p>
-<p>The next step is wrap the method <code>#create</code> with the proper business action
-call.</p>
+<p>It will generically manage exceptions in case some unauthorized user tries to force acting without having access.</p>
+<p>The next step is to wrap the method <code>#create</code> with the proper business action call.</p>
 <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">BooksController</span> <span class="o">&lt;</span> <span class="no">ApplicationController</span>
 
   <span class="c1"># ...</span>
@@ -963,7 +961,7 @@ call.</p>
 </pre></div>
 
 
-<p>and add available column in the books table:</p>
+<p>and add an <code>available</code> column in the books table:</p>
 <div class="codehilite"><pre><span></span>rails g migration add_availability_to_books available:boolean
 </pre></div>
 
@@ -983,12 +981,12 @@ call.</p>
   <span class="n">let</span><span class="p">(</span><span class="ss">:book</span><span class="p">)</span> <span class="p">{</span> <span class="no">Book</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="ss">title</span><span class="p">:</span> <span class="s1">&#39;First book&#39;</span><span class="p">,</span> <span class="ss">available</span><span class="p">:</span> <span class="n">available</span><span class="p">)</span> <span class="p">}</span>
 
   <span class="n">describe</span> <span class="s1">&#39;preconditions&#39;</span> <span class="k">do</span>
-    <span class="n">context</span> <span class="s1">&#39;with available book&#39;</span> <span class="k">do</span>
+    <span class="n">context</span> <span class="s1">&#39;with an available book&#39;</span> <span class="k">do</span>
       <span class="n">let</span><span class="p">(</span><span class="ss">:available</span><span class="p">)</span> <span class="p">{</span> <span class="kp">true</span> <span class="p">}</span>
       <span class="n">it</span> <span class="p">{</span> <span class="n">is_expected</span><span class="o">.</span><span class="n">to</span> <span class="n">be_satisfy_preconditions</span> <span class="p">}</span>
     <span class="k">end</span>
 
-    <span class="n">context</span> <span class="s1">&#39;with unavailable book&#39;</span> <span class="k">do</span>
+    <span class="n">context</span> <span class="s1">&#39;with an unavailable book&#39;</span> <span class="k">do</span>
       <span class="n">let</span><span class="p">(</span><span class="ss">:available</span><span class="p">)</span> <span class="p">{</span> <span class="kp">false</span> <span class="p">}</span>
       <span class="n">it</span> <span class="p">{</span> <span class="n">is_expected</span><span class="o">.</span><span class="n">to</span> <span class="n">be_invalid</span> <span class="p">}</span>
       <span class="n">it</span> <span class="p">{</span> <span class="n">is_expected</span><span class="o">.</span><span class="n">not_to</span> <span class="n">satisfy_preconditions</span> <span class="p">}</span>
@@ -999,7 +997,7 @@ call.</p>
 
 
 <p><a href="../granite/#preconditions">Preconditions</a> are related to the book in the context.
-And the action will decline the context to not be executed if it does not satisfy the preconditions.</p>
+And the action will decline the context not to be executed if it does not satisfy the preconditions.</p>
 <p>Let's implement the <code>precondition</code> and <code>perform</code> code:</p>
 <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">BA</span><span class="o">::</span><span class="no">Book</span><span class="o">::</span><span class="no">Rent</span> <span class="o">&lt;</span> <span class="no">BA</span><span class="o">::</span><span class="no">Book</span><span class="o">::</span><span class="no">BusinessAction</span>
   <span class="n">precondition</span> <span class="p">{</span> <span class="n">book</span><span class="o">.</span><span class="n">available?</span> <span class="p">}</span>
@@ -1037,7 +1035,7 @@ And the action will decline the context to not be executed if it does not satisf
 
 
 <h2 id="bookdeliverback">Book::DeliverBack<a class="headerlink" href="#bookdeliverback" title="Permanent link">&para;</a></h2>
-<p>To deliver back a book, it need to be rented by the person that is logged in.</p>
+<p>First, think about the policies: to deliver back the book, it needs to be rented by the person that is logged in.</p>
 <p>Then we need to have a precondition to verify if the current book is being
 rented by this person:</p>
 <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">BA</span><span class="o">::</span><span class="no">Book</span><span class="o">::</span><span class="no">DeliverBack</span> <span class="o">&lt;</span> <span class="no">BA</span><span class="o">::</span><span class="no">Book</span><span class="o">::</span><span class="no">BusinessAction</span>
@@ -1099,8 +1097,8 @@ rent the book can deliver it back.</p>
 </pre></div>
 
 
-<p>Now implementing the spec that covers the logic of deliver back, is expected to
-make the book available and mark the rental with the delivered date.</p>
+<p>Now implementing the spec that covers the logic of delivering back, is expected to
+make the book available and mark the rental with the given date.</p>
 <div class="codehilite"><pre><span></span><span class="no">RSpec</span><span class="o">.</span><span class="n">describe</span> <span class="no">BA</span><span class="o">::</span><span class="no">Book</span><span class="o">::</span><span class="no">DeliverBack</span> <span class="k">do</span>
   <span class="n">subject</span><span class="p">(</span><span class="ss">:action</span><span class="p">)</span> <span class="p">{</span> <span class="n">described_class</span><span class="o">.</span><span class="n">as</span><span class="p">(</span><span class="n">performer</span><span class="p">)</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">book</span><span class="p">)</span> <span class="p">}</span>
 
@@ -1123,9 +1121,10 @@ make the book available and mark the rental with the delivered date.</p>
 
 
 <h2 id="i18n">I18n<a class="headerlink" href="#i18n" title="Permanent link">&para;</a></h2>
-<p>A last step to make it user friendly is add a key to return a personalized
+<p>The last step to make it user-friendly and return a personalized
 message when the business action calls <code>decline_with(:unavailable)</code>.</p>
-<p>It's time to create <code>config/locales/granite.en.yml</code> file:</p>
+<p>It's time to create the internationalization file for it.</p>
+<p>File: <code>config/locales/granite.en.yml</code></p>
 <div class="codehilite"><pre><span></span>en:
   granite_action:
     errors:
@@ -1143,14 +1142,14 @@ actions we created.</p>
 business actions and create routes for it.</p>
 <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">BooksController</span> <span class="o">&lt;</span> <span class="no">ApplicationController</span>
 
-  <span class="c1"># a few other scaffold methods here...</span>
+  <span class="c1"># a few other scaffold methods here</span>
 
   <span class="c1"># POST /books/1/rent</span>
   <span class="k">def</span> <span class="nf">rent</span>
     <span class="vi">@book</span> <span class="o">=</span> <span class="no">Book</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">params</span><span class="o">[</span><span class="ss">:book_id</span><span class="o">]</span><span class="p">)</span>
     <span class="n">book_action</span> <span class="o">=</span> <span class="no">BA</span><span class="o">::</span><span class="no">Book</span><span class="o">::</span><span class="no">Rent</span><span class="o">.</span><span class="n">as</span><span class="p">(</span><span class="n">current_user</span><span class="p">)</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="vi">@book</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">book_action</span><span class="o">.</span><span class="n">perform</span>
-      <span class="n">redirect_to</span> <span class="n">books_url</span><span class="p">,</span> <span class="ss">notice</span><span class="p">:</span> <span class="s1">&#39;Book was successfully rented.&#39;</span>
+      <span class="n">redirect_to</span> <span class="n">books_url</span><span class="p">,</span> <span class="ss">notice</span><span class="p">:</span> <span class="s1">&#39;Enjoy the book!&#39;</span>
     <span class="k">else</span>
       <span class="n">redirect_to</span> <span class="n">books_url</span><span class="p">,</span> <span class="ss">alert</span><span class="p">:</span>  <span class="n">book_action</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">full_messages</span>
     <span class="k">end</span>
@@ -1202,22 +1201,21 @@ business actions and create routes for it.</p>
 
 
 <p>Now is a good opportunity to introduce <a href="../projectors/">projectors</a>.</p>
-<p>Look that we have a few boilerplate code in the controller that make us repeat a
-few different logics that are already declared in the business action.</p>
-<p>Projectors can help with that. Avoiding the need of creating repetivive
+<p>The actual implementation contains a few boilerplate codes in the controller that make us repeat a
+few different logics that are already in the business action.</p>
+<p>Projectors can help with that. Avoiding the need for creating repetitive
 controller methods and reverify preconditions and policies to decide what
 actions can be executed.</p>
 <h3 id="setup-view-context-for-granite-projector">Setup view context for Granite projector<a class="headerlink" href="#setup-view-context-for-granite-projector" title="Permanent link">&para;</a></h3>
-<p>You'll need to setup the master controller class. Let's create a file to setup
-it:</p>
-<p><code>config/initializers/granite.rb</code></p>
+<p>You'll need to set up the master controller class. Let's create a file to configure what will be the base controller for granite:</p>
+<p>File: <code>config/initializers/granite.rb</code></p>
 <div class="codehilite"><pre><span></span><span class="no">Granite</span><span class="o">.</span><span class="n">tap</span> <span class="k">do</span> <span class="o">|</span><span class="n">m</span><span class="o">|</span>
   <span class="n">m</span><span class="o">.</span><span class="n">base_controller</span> <span class="o">=</span> <span class="s1">&#39;ApplicationController&#39;</span>
 <span class="k">end</span>
 </pre></div>
 
 
-<p>The next step is setup granite in the <code>ApplicationController</code> to setup context
+<p>The next step is to change <code>ApplicationController</code> to setup context
 view and allow granite to inherit behavior from it.</p>
 <p><code>app/controllers/application_controller</code></p>
 <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">ApplicationController</span> <span class="o">&lt;</span> <span class="no">ActionController</span><span class="o">::</span><span class="no">Base</span>
@@ -1235,15 +1233,14 @@ view and allow granite to inherit behavior from it.</p>
 
 <h2 id="inline-projector">Inline projector<a class="headerlink" href="#inline-projector" title="Permanent link">&para;</a></h2>
 <p>The current <code>rent</code> and <code>delivered_back</code> methods have a very similar structure.</p>
-<p>And the projectors allows to simply declare the HTTP method like <code>get</code> or
-<code>post</code> and mount it in a route as an anonymous controller.</p>
+<p>And the projectors allows to declare the HTTP method like <code>get</code> or <code>post</code> and mount it in a route as an anonymous controller.</p>
 <p>Inside the block, the action is already set with all parameters from the web
 request and ready to be executed.</p>
-<p>As the current controller actions are executed with POST, let's follow in the same line and
+<p>As the current controller actions are executed with <code>POST</code>, let's follow the same line and
 create a simple projector that allows to receive some post data and redirect to the resources list back.</p>
-<p>The projector will have a default <code>success_redirect</code> and <code>failure_redirect</code> after perform the action.
+<p>The projector will have a default <code>success_redirect</code> and <code>failure_redirect</code> after the action execution.
 By default, let's assume that we'll redirect it to the collection and render a
-positive notice or a negative alert about the previous action.</p>
+positive notice or a negative alert to the previous action.</p>
 <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">InlineProjector</span> <span class="o">&lt;</span> <span class="no">Granite</span><span class="o">::</span><span class="no">Projector</span>
 
   <span class="n">post</span> <span class="ss">:perform</span><span class="p">,</span> <span class="ss">as</span><span class="p">:</span> <span class="s1">&#39;&#39;</span> <span class="k">do</span>
@@ -1271,8 +1268,8 @@ positive notice or a negative alert about the previous action.</p>
 
 
 <p>We also need to say who is the performer of the action.
-he <code>build_action</code> method in the projector is implemented to override the
-current performer in the action with the <code>current_role</code>.</p>
+The <code>build_action</code> method in the projector is implemented to override the
+current performer in action with the <code>current_role</code>.</p>
 <div class="admonition info">
 <p class="admonition-title">Info</p>
 <p>Note that <code>h</code> is an alias for <code>view_context</code> and you can access anything
@@ -1321,7 +1318,7 @@ end
 </pre></div>
 
 
-<p>As a last step we need to change the <code>config/routes.rb</code> to use the <code>granite</code>
+<p>As the last step, we need to change the <code>config/routes.rb</code> to use the <code>granite</code>
 keyword to mount the <code>action#projector</code> into some route.</p>
 <p>File: <code>config/routes.rb</code></p>
 <div class="codehilite"><pre><span></span>Rails.application.routes.draw do
@@ -1340,11 +1337,11 @@ end
 
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p>As it's a tutorial, your next task is do the same for <code>deliver_back</code>.</p>
+<p>As it's a tutorial, your next task is to do the same for <code>deliver_back</code>.</p>
 <ol>
 <li>Add <code>projector :inline</code> to <code>BA::Book::DeliverBack</code> class.</li>
 <li>Remove the controller method</li>
-<li>Refactor the route declaring the <code>granite 'action#projector'</code></li>
+<li>Refactor the <code>config/routes.rb</code> declaring the <code>granite 'action#projector'</code></li>
 </ol>
 </div>
 <h2 id="projector-helpers">Projector Helpers<a class="headerlink" href="#projector-helpers" title="Permanent link">&para;</a></h2>
@@ -1355,13 +1352,13 @@ to replace the action links in the current list.</p>
 the action is performable.</p>
 <p>It will render nothing if the current user does not have access or it's an
 anonymous session.</p>
-<p>We'll render the action name striked if the action is not performable with the
-error messages in the title, because if people mouse over they can see the
+<p>We'll render the action name stricken if the action is not performable with the
+error messages in the title, because if people mouse over, they can see the
 "tooltip" with why it's not possible to execute the action.</p>
 <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">InlineProjector</span> <span class="o">&lt;</span> <span class="no">Granite</span><span class="o">::</span><span class="no">Projector</span>
 
   <span class="c1"># ...</span>
-  <span class="c1"># The previous methods remains here</span>
+  <span class="c1"># The previous methods remain here</span>
   <span class="c1"># ...</span>
 
   <span class="k">def</span> <span class="nf">button</span><span class="p">(</span><span class="n">link_options</span> <span class="o">=</span> <span class="p">{})</span>
@@ -1394,13 +1391,13 @@ error messages in the title, because if people mouse over they can see the
 </pre></div>
 
 
-<p>Now it's very clear and the "Deliver Back" link will appear only for the user
+<p>Now it's clear, and the "Deliver Back" link will appear only for the user
 that rented the book.</p>
 <p>Look a print screen comparing two users looking for two books. The user from
-the left side have rented "Learn to fly" book.</p>
+the left side has rented "Learn to fly" book.</p>
 <p><img alt="List of books with links" src="../img/tutorial_example_books_list.png" /></p>
-<p>Now, look that does not make sense to have the Rent appearing ~~striked~~ when
-the person is renting the book. We can simply change the policies to hide the
+<p>Now, look that does not make sense to have the Rent appearing stricken when
+the person is renting the book. We can change the policies to hide the
 action link.</p>
 <div class="codehilite"><pre><span></span><span class="gu">@@ -1,6 +1,7 @@</span>
  # frozen_string_literal: true
@@ -1413,7 +1410,7 @@ action link.</p>
 </pre></div>
 
 
-<p>And now the striked <code>Rent</code> disappeared for the user that is already renting the book.</p>
+<p>And now the stricken <code>Rent</code> disappeared for the user that is already renting the book.</p>
 <p><img alt="List of books with links" src="../img/tutorial_example_books_list_after_refactoring.png" /></p>
 <h2 id="wishlistadd">Wishlist::Add<a class="headerlink" href="#wishlistadd" title="Permanent link">&para;</a></h2>
 <h2 id="wishlistremove">Wishlist::Remove<a class="headerlink" href="#wishlistremove" title="Permanent link">&para;</a></h2>
