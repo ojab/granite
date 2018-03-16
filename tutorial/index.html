@@ -1396,6 +1396,25 @@ error messages in the title, because if people mouse over they can see the
 
 <p>Now it's very clear and the "Deliver Back" link will appear only for the user
 that rented the book.</p>
+<p>Look a print screen comparing two users looking for two books. The user from
+the left side have rented "Learn to fly" book.</p>
+<p><img alt="List of books with links" src="../img/tutorial_example_books_list.png" /></p>
+<p>Now, look that does not make sense to have the Rent appearing ~~striked~~ when
+the person is renting the book. We can simply change the policies to hide the
+action link.</p>
+<div class="codehilite"><pre><span></span><span class="gu">@@ -1,6 +1,7 @@</span>
+ # frozen_string_literal: true
+
+ class Ba::Book::Rent &lt; BaseAction
+<span class="gi">+  allow_if { !performer.renting?(subject) }</span>
+   allow_if { performer.is_a?(User) }
+
+   projector :inline
+</pre></div>
+
+
+<p>And now the striked <code>Rent</code> disappeared for the user that is already renting the book.</p>
+<p><img alt="List of books with links" src="../img/tutorial_example_books_list_after_refactoring.png" /></p>
 <h2 id="wishlistadd">Wishlist::Add<a class="headerlink" href="#wishlistadd" title="Permanent link">&para;</a></h2>
 <h2 id="wishlistremove">Wishlist::Remove<a class="headerlink" href="#wishlistremove" title="Permanent link">&para;</a></h2>
 <h2 id="wishlistnotifyavailability">Wishlist::NotifyAvailability<a class="headerlink" href="#wishlistnotifyavailability" title="Permanent link">&para;</a></h2>
