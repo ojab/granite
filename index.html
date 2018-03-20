@@ -262,6 +262,13 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#what-problems-it-solves" title="What problems it solves?" class="md-nav__link">
+    What problems it solves?
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#business-actions" title="Business actions" class="md-nav__link">
     Business actions
   </a>
@@ -465,6 +472,13 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#what-problems-it-solves" title="What problems it solves?" class="md-nav__link">
+    What problems it solves?
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#business-actions" title="Business actions" class="md-nav__link">
     Business actions
   </a>
@@ -620,14 +634,26 @@
                 
                 
                 <h1 id="granite-framework">Granite Framework<a class="headerlink" href="#granite-framework" title="Permanent link">&para;</a></h1>
-<p>Granite is Business Actions architecture for Rails apps.</p>
+<p>Granite is a business actions architecture for Rails apps.</p>
 <p>It's a combination of user interaction (attributes and validations), context (preconditions) and
 permissions (authorization policies).</p>
+<h2 id="what-problems-it-solves">What problems it solves?<a class="headerlink" href="#what-problems-it-solves" title="Permanent link">&para;</a></h2>
+<p>When your application becomes more prominent, you use patterns to allow you to
+leverage your productivity. Instead of start inflating the controller and
+model, you create a folder "app/managers" or something similar and start
+pushing your business logic there.</p>
+<p>These managers deals with a user wanting to perform some action interacting with the system.
+The user needs to send some extra data to accomplish the task.
+Some subject data is going to be managed during the action.</p>
+<p>While implementing such actions, you have the choice if you want to introduce
+validations and inflate the manager or keep the validations on the
+controller. That can repeat in case multiple endpoints consume it.</p>
 <h2 id="business-actions">Business actions<a class="headerlink" href="#business-actions" title="Permanent link">&para;</a></h2>
 <p>The central concept of Granite is a business action. Each business action can
-have a simple <code>execute_perform!</code> method.</p>
+start from a simple <code>execute_perform!</code> method.</p>
 <h3 id="hello-world">Hello world<a class="headerlink" href="#hello-world" title="Permanent link">&para;</a></h3>
-<p>Basically it is an active model-like class (form object) defined to execute a sequence of commands. The simplest business action looks like this:</p>
+<p>Basically it is an active model-like class (form object) defined to execute a sequence of commands.
+The simplest business action looks like this:</p>
 <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">Action</span> <span class="o">&lt;</span> <span class="no">Granite</span><span class="o">::</span><span class="no">Action</span>
   <span class="kp">private</span> <span class="k">def</span> <span class="nf">execute_perform!</span><span class="p">(</span><span class="o">*</span><span class="p">)</span>
     <span class="nb">puts</span> <span class="s1">&#39;Hello World&#39;</span>
@@ -666,9 +692,9 @@ The main difference between these methods is: <code>#perform!</code> raises exce
   <span class="n">collection</span> <span class="ss">:ids</span><span class="p">,</span> <span class="nb">Integer</span>
 
   <span class="kp">private</span> <span class="k">def</span> <span class="nf">execute_perform!</span><span class="p">(</span><span class="o">*</span><span class="p">)</span>
-    <span class="nb">puts</span> <span class="s1">&#39;Hello World&#39;</span>
-  <span class="k">end</span>
-<span class="k">end</span>
+    <span class="nb">puts</span> <span class="s2">&quot;Hello </span><span class="si">#{</span><span class="nb">name</span><span class="si">}</span><span class="s2">! We have the following ids: </span><span class="si">#{</span><span class="n">ids</span><span class="si">}</span><span class="s2">&#39;</span>
+<span class="s2">  end</span>
+<span class="s2">end</span>
 </pre></div>
 
 
