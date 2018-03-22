@@ -1181,7 +1181,7 @@ business actions and create routes for it.</p>
 <span class="x">          &lt;td&gt;(Rented)&lt;/td&gt;</span>
 <span class="x">        </span><span class="cp">&lt;%</span> <span class="k">end</span> <span class="cp">%&gt;</span><span class="x"></span>
 <span class="x">        </span><span class="cp">&lt;%</span> <span class="k">if</span> <span class="n">current_user</span> <span class="o">&amp;&amp;</span> <span class="n">current_user</span><span class="o">.</span><span class="n">renting?</span><span class="p">(</span><span class="n">book</span><span class="p">)</span> <span class="cp">%&gt;</span><span class="x"></span>
-<span class="x">           &lt;td&gt;</span><span class="cp">&lt;%=</span> <span class="n">link_to</span> <span class="s1">&#39;Return&#39;</span><span class="p">,</span> <span class="n">return_book_book_path</span><span class="p">(</span><span class="n">book</span><span class="p">),</span> <span class="nb">method</span><span class="p">:</span> <span class="ss">:post</span> <span class="cp">%&gt;</span><span class="x">&lt;/td&gt;</span>
+<span class="x">           &lt;td&gt;</span><span class="cp">&lt;%=</span> <span class="n">link_to</span> <span class="s1">&#39;Return&#39;</span><span class="p">,</span> <span class="n">return_book_path</span><span class="p">(</span><span class="n">book</span><span class="p">),</span> <span class="nb">method</span><span class="p">:</span> <span class="ss">:post</span> <span class="cp">%&gt;</span><span class="x">&lt;/td&gt;</span>
 <span class="x">        </span><span class="cp">&lt;%</span> <span class="k">end</span> <span class="cp">%&gt;</span><span class="x"></span>
 <span class="x">        &lt;td&gt;</span><span class="cp">&lt;%=</span> <span class="n">link_to</span> <span class="s1">&#39;Show&#39;</span><span class="p">,</span> <span class="n">book</span> <span class="cp">%&gt;</span><span class="x">&lt;/td&gt;</span>
 <span class="x">        &lt;td&gt;</span><span class="cp">&lt;%=</span> <span class="n">link_to</span> <span class="s1">&#39;Edit&#39;</span><span class="p">,</span> <span class="n">edit_book_path</span><span class="p">(</span><span class="n">book</span><span class="p">)</span> <span class="cp">%&gt;</span><span class="x">&lt;/td&gt;</span>
@@ -1321,7 +1321,7 @@ to mount the <code>action#projector</code> into the defined routes.</p>
   resources :books do
 <span class="gd">-   post :rent</span>
 <span class="gi">+   granite &#39;BA/book/rent#inline&#39;</span>
-    post &#39;return&#39;, to: &#39;books#return_book&#39;
+    post &#39;return&#39;, to: &#39;books#return_book&#39;, as &#39;return&#39;
   end
 end
 </pre></div>
