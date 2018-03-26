@@ -679,24 +679,24 @@
                 
                 <h1 id="application-example">Application example<a class="headerlink" href="#application-example" title="Permanent link">&para;</a></h1>
 <p>The business we're going to cover is straightforward.
-It will be a book library, and we need to allow logged users to create new
+It will be a book library, and we need to allow logged in users to create new
 books and rent it.</p>
 <h2 id="book-library">Book library<a class="headerlink" href="#book-library" title="Permanent link">&para;</a></h2>
 <p>A simple system to track books. Each book has a title.</p>
 <ul>
 <li>Everybody can view the list of books</li>
-<li><strong>Only</strong> logged users can edit the books</li>
-<li>Logged users can <strong>edit</strong> or <strong>remove</strong> a book</li>
+<li><strong>Only</strong> logged in users can edit the books</li>
+<li>Logged in users can <strong>edit</strong> or <strong>remove</strong> a book</li>
 </ul>
 <h3 id="the-rental-system">The Rental system<a class="headerlink" href="#the-rental-system" title="Permanent link">&para;</a></h3>
 <ul>
 <li>All available books can be <strong>rented</strong></li>
-<li>Logged users can rent a book</li>
+<li>Logged in users can rent a book</li>
 <li>A book is not <strong>available</strong> when it's rented to someone</li>
 <li>A book is <strong>available</strong> after return</li>
 </ul>
 <h3 id="books-wishlist">Books wishlist<a class="headerlink" href="#books-wishlist" title="Permanent link">&para;</a></h3>
-<p>The logged user can manage a <strong>wishlist</strong> considering:</p>
+<p>The logged in user can manage a <strong>wishlist</strong> considering:</p>
 <ul>
 <li>When a book is <strong>not available</strong> and the user <strong>didn't read</strong> it</li>
 <li>If the person <strong>already read</strong> the book, also <strong>doesn't make sense add it to the wishlist</strong></li>
@@ -743,6 +743,11 @@ users. Adding it to <code>Gemfile</code>.</p>
 </pre></div>
 
 
+<p>And migrate again:</p>
+<div class="codehilite"><pre><span></span>rails db:migrate
+</pre></div>
+
+
 <div class="admonition info">
 <p class="admonition-title">Info</p>
 <p>If you get in any trouble in this section, please check the updated
@@ -775,7 +780,7 @@ the <a href="../testing/">testing</a> section.</p>
 </pre></div>
 
 
-<p>The following classes were generated:</p>
+<p>The following class was generated:</p>
 <div class="codehilite"><pre><span></span><span class="c1"># apq/actions/ba/book/create.rb</span>
 <span class="k">class</span> <span class="nc">BA</span><span class="o">::</span><span class="no">Book</span><span class="o">::</span><span class="no">Create</span> <span class="o">&lt;</span> <span class="no">BA</span><span class="o">::</span><span class="no">Book</span><span class="o">::</span><span class="no">BusinessAction</span>
   <span class="n">allow_if</span> <span class="p">{</span> <span class="kp">false</span> <span class="p">}</span>
@@ -792,7 +797,8 @@ the <a href="../testing/">testing</a> section.</p>
 </pre></div>
 
 
-<p>And also a default business action was added to the shared subject:</p>
+<p>Additionally, a "base", shared class is generated, that defines the subject
+type for all the inherited classes in the namespace Book.</p>
 <div class="codehilite"><pre><span></span>class BA::Book::BusinessAction &lt; BaseAction
   subject :book
 end
@@ -801,7 +807,7 @@ end
 
 <h2 id="policies">Policies<a class="headerlink" href="#policies" title="Permanent link">&para;</a></h2>
 <p>The generated code says <code>allow_if { false }</code> and we need to restrict it to
-logged users. Let's replace this line to restrict the action only for logged users:</p>
+logged in users. Let's replace this line to restrict the action only for logged in users:</p>
 <div class="codehilite"><pre><span></span><span class="c1"># apq/actions/ba/book/create.rb</span>
 <span class="k">class</span> <span class="nc">BA</span><span class="o">::</span><span class="no">Book</span><span class="o">::</span><span class="no">Create</span> <span class="o">&lt;</span> <span class="no">BA</span><span class="o">::</span><span class="no">Book</span><span class="o">::</span><span class="no">BusinessAction</span>
   <span class="n">allow_if</span> <span class="p">{</span> <span class="n">performer</span><span class="o">.</span><span class="n">is_a?</span><span class="p">(</span><span class="no">User</span><span class="p">)</span> <span class="p">}</span>
@@ -884,24 +890,39 @@ we need to define attributes for it:</p>
 <p>For now, the perform is a simple call to <code>book.save!</code> because Granite already
 assign the attributes.</p>
 <p>Then we need to test if it's generating the right record:</p>
-<div class="codehilite"><pre><span></span><span class="nb">require</span> <span class="s1">&#39;rails_helper&#39;</span>
+<div class="codehilite"><pre><span></span>require &#39;rails_helper&#39;
 
-<span class="no">RSpec</span><span class="o">.</span><span class="n">describe</span> <span class="no">BA</span><span class="o">::</span><span class="no">Book</span><span class="o">::</span><span class="no">Create</span> <span class="k">do</span>
-  <span class="n">subject</span><span class="p">(</span><span class="ss">:action</span><span class="p">)</span> <span class="p">{</span> <span class="n">described_class</span><span class="o">.</span><span class="n">as</span><span class="p">(</span><span class="n">performer</span><span class="p">)</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">attributes</span><span class="p">)</span> <span class="p">}</span>
+RSpec.describe BA::Book::Create do
+  subject(:action) { described_class.as(performer).new(attributes) }
 
-  <span class="n">let</span><span class="p">(</span><span class="ss">:performer</span><span class="p">)</span> <span class="p">{</span> <span class="no">User</span><span class="o">.</span><span class="n">new</span> <span class="p">}</span>
-  <span class="n">let</span><span class="p">(</span><span class="ss">:attributes</span><span class="p">)</span> <span class="p">{</span> <span class="p">{</span> <span class="s1">&#39;title&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Ruby Pickaxe&#39;</span><span class="p">}</span> <span class="p">}</span>
+  let(:performer) { User.new }
+  let(:attributes) { { &#39;title&#39; =&gt; &#39;Ruby Pickaxe&#39;} }
 
-  <span class="c1"># describe &#39;policies&#39; ...</span>
-  <span class="c1"># describe &#39;validations&#39; ...</span>
+  describe &#39;policies&#39; do
+    it { is_expected.to be_allowed }
 
-  <span class="n">describe</span> <span class="s1">&#39;#perform!&#39;</span> <span class="k">do</span>
-    <span class="n">specify</span> <span class="k">do</span>
-      <span class="n">expect</span> <span class="p">{</span> <span class="n">action</span><span class="o">.</span><span class="n">perform!</span> <span class="p">}</span><span class="o">.</span><span class="n">to</span> <span class="n">change</span> <span class="p">{</span> <span class="no">Book</span><span class="o">.</span><span class="n">count</span> <span class="p">}</span><span class="o">.</span><span class="n">by</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-      <span class="n">expect</span><span class="p">(</span><span class="n">action</span><span class="o">.</span><span class="n">subject</span><span class="o">.</span><span class="n">attributes</span><span class="o">.</span><span class="n">except</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="s1">&#39;created_at&#39;</span><span class="p">,</span> <span class="s1">&#39;updated_at&#39;</span><span class="p">))</span><span class="o">.</span><span class="n">to</span> <span class="n">eq</span><span class="p">(</span><span class="n">attributes</span><span class="p">)</span>
-    <span class="k">end</span>
-  <span class="k">end</span>
-<span class="k">end</span>
+    context &#39;when the user is not authorized&#39; do
+      let(:performer) { double }
+      it { is_expected.not_to be_allowed }
+    end
+  end
+
+  describe &#39;validations&#39; do
+    it { is_expected.to be_valid }
+
+    context &#39;when preconditions fail&#39; do
+      let(:attributes) { { } }
+      it { is_expected.not_to be_valid }
+    end
+  end
+
+<span class="gi">+   describe &#39;#perform!&#39; do</span>
+<span class="gi">+     specify do</span>
+<span class="gi">+       expect { action.perform! }.to change { Book.count }.by(1)</span>
+<span class="gi">+       expect(action.subject.attributes.except(&#39;id&#39;, &#39;created_at&#39;, &#39;updated_at&#39;)).to eq(attributes)</span>
+<span class="gi">+     end</span>
+<span class="gi">+   end</span>
+end
 </pre></div>
 
 
@@ -991,38 +1012,49 @@ to be executed.</p>
 <p><a href="../granite/#preconditions">Preconditions</a> are related to the book in the context.
 And the action will decline the context not to be executed if it does not satisfy the preconditions.</p>
 <p>Let's implement the <code>precondition</code> and <code>perform</code> code:</p>
-<div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">BA</span><span class="o">::</span><span class="no">Book</span><span class="o">::</span><span class="no">Rent</span> <span class="o">&lt;</span> <span class="no">BA</span><span class="o">::</span><span class="no">Book</span><span class="o">::</span><span class="no">BusinessAction</span>
-  <span class="n">precondition</span> <span class="p">{</span> <span class="n">book</span><span class="o">.</span><span class="n">available?</span> <span class="p">}</span>
+<div class="codehilite"><pre><span></span>class BA::Book::Rent &lt; BA::Book::BusinessAction
+<span class="gi">+ precondition { book.available? }</span>
 
-  <span class="kp">private</span>
+  private
 
-  <span class="k">def</span> <span class="nf">execute_perform!</span><span class="p">(</span><span class="o">*</span><span class="p">)</span>
-    <span class="no">Rental</span><span class="o">.</span><span class="n">create!</span><span class="p">(</span><span class="ss">book</span><span class="p">:</span> <span class="n">subject</span><span class="p">,</span> <span class="ss">user</span><span class="p">:</span> <span class="n">performer</span><span class="p">)</span>
-    <span class="n">subject</span><span class="o">.</span><span class="n">available</span> <span class="o">=</span> <span class="kp">false</span>
-    <span class="n">subject</span><span class="o">.</span><span class="n">save!</span>
-  <span class="k">end</span>
-<span class="k">end</span>
+  def execute_perform!(*)
+    Rental.create!(book: subject, user: performer)
+    subject.available = false
+    subject.save!
+  end
+end
 </pre></div>
 
 
 <p>Now, let's cover the perform with another spec:</p>
-<div class="codehilite"><pre><span></span><span class="no">RSpec</span><span class="o">.</span><span class="n">describe</span> <span class="no">BA</span><span class="o">::</span><span class="no">Book</span><span class="o">::</span><span class="no">Rent</span> <span class="k">do</span>
-  <span class="n">subject</span><span class="p">(</span><span class="ss">:action</span><span class="p">)</span> <span class="p">{</span> <span class="n">described_class</span><span class="o">.</span><span class="n">as</span><span class="p">(</span><span class="n">performer</span><span class="p">)</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">book</span><span class="p">)</span> <span class="p">}</span>
+<div class="codehilite"><pre><span></span>RSpec.describe BA::Book::Rent do
+  subject(:action) { described_class.as(performer).new(book) }
 
-  <span class="n">let</span><span class="p">(</span><span class="ss">:performer</span><span class="p">)</span> <span class="p">{</span> <span class="no">User</span><span class="o">.</span><span class="n">new</span> <span class="p">}</span>
+  let(:performer) { User.new }
 
-  <span class="n">let</span><span class="p">(</span><span class="ss">:book</span><span class="p">)</span> <span class="p">{</span> <span class="no">Book</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="ss">title</span><span class="p">:</span> <span class="s1">&#39;First book&#39;</span><span class="p">,</span> <span class="ss">available</span><span class="p">:</span> <span class="n">available</span><span class="p">)</span> <span class="p">}</span>
+  let(:book) { Book.new(title: &#39;First book&#39;, available: available) }
 
-  <span class="c1"># describe &#39;preconditions&#39; ...</span>
+<span class="gi">+ describe &#39;preconditions&#39; do</span>
+<span class="gi">+   context &#39;with an available book&#39; do</span>
+<span class="gi">+     let(:available) { true }</span>
+<span class="gi">+     it { is_expected.to be_satisfy_preconditions }</span>
+<span class="gi">+   end</span>
+<span class="gi">+</span>
+<span class="gi">+   context &#39;with an unavailable book&#39; do</span>
+<span class="gi">+     let(:available) { false }</span>
+<span class="gi">+     it { is_expected.to be_invalid }</span>
+<span class="gi">+     it { is_expected.not_to satisfy_preconditions }</span>
+<span class="gi">+   end</span>
+<span class="gi">+ end</span>
 
-  <span class="n">describe</span> <span class="s1">&#39;#perform!&#39;</span> <span class="k">do</span>
-    <span class="n">specify</span> <span class="k">do</span>
-      <span class="n">expect</span> <span class="p">{</span> <span class="n">action</span><span class="o">.</span><span class="n">perform!</span> <span class="p">}</span>
-        <span class="o">.</span><span class="n">to</span> <span class="n">change</span><span class="p">(</span><span class="n">book</span><span class="p">,</span> <span class="ss">:available</span><span class="p">)</span><span class="o">.</span><span class="n">from</span><span class="p">(</span><span class="kp">true</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="kp">false</span><span class="p">)</span>
-        <span class="o">.</span><span class="n">and</span> <span class="n">change</span><span class="p">(</span><span class="no">Rental</span><span class="p">,</span> <span class="ss">:count</span><span class="p">)</span><span class="o">.</span><span class="n">by</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-    <span class="k">end</span>
-  <span class="k">end</span>
-<span class="k">end</span>
+  describe &#39;#perform!&#39; do
+    specify do
+      expect { action.perform! }
+        .to change(book, :available).from(true).to(false)
+        .and change(Rental, :count).by(1)
+    end
+  end
+end
 </pre></div>
 
 
@@ -1080,10 +1112,10 @@ rent the book can return it.</p>
 <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">User</span> <span class="o">&lt;</span> <span class="no">ApplicationRecord</span>
   <span class="n">devise</span> <span class="ss">:database_authenticatable</span><span class="p">,</span> <span class="ss">:registerable</span>
   <span class="n">has_many</span> <span class="ss">:rentals</span>
-  <span class="n">has_many</span> <span class="ss">:books</span><span class="p">,</span> <span class="ss">through</span><span class="p">:</span> <span class="ss">:rents</span>
+  <span class="n">has_many</span> <span class="ss">:books</span><span class="p">,</span> <span class="ss">through</span><span class="p">:</span> <span class="ss">:rentals</span>
 
   <span class="k">def</span> <span class="nf">renting?</span><span class="p">(</span><span class="n">book</span><span class="p">)</span>
-    <span class="n">rentals</span><span class="o">.</span><span class="n">current</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="ss">book_id</span><span class="p">:</span> <span class="n">book</span><span class="o">.</span><span class="n">id</span><span class="p">)</span><span class="o">.</span><span class="n">exists?</span>
+    <span class="n">rentals</span><span class="o">.</span><span class="n">current</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="ss">book</span><span class="p">:</span> <span class="n">book</span><span class="p">)</span><span class="o">.</span><span class="n">exists?</span>
   <span class="k">end</span>
 <span class="k">end</span>
 </pre></div>
@@ -1091,24 +1123,33 @@ rent the book can return it.</p>
 
 <p>Now implementing the spec that covers the logic of return, is expected to
 make the book available and mark the rental with the given date.</p>
-<div class="codehilite"><pre><span></span><span class="no">RSpec</span><span class="o">.</span><span class="n">describe</span> <span class="no">BA</span><span class="o">::</span><span class="no">Book</span><span class="o">::</span><span class="no">Return</span> <span class="k">do</span>
-  <span class="n">subject</span><span class="p">(</span><span class="ss">:action</span><span class="p">)</span> <span class="p">{</span> <span class="n">described_class</span><span class="o">.</span><span class="n">as</span><span class="p">(</span><span class="n">performer</span><span class="p">)</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">book</span><span class="p">)</span> <span class="p">}</span>
+<div class="codehilite"><pre><span></span>RSpec.describe BA::Book::Return do
+  subject(:action) { described_class.as(performer).new(book) }
 
-  <span class="n">let</span><span class="p">(</span><span class="ss">:book</span><span class="p">)</span> <span class="p">{</span> <span class="no">Book</span><span class="o">.</span><span class="n">create!</span> <span class="ss">title</span><span class="p">:</span> <span class="s1">&#39;Learn to fly&#39;</span><span class="p">,</span> <span class="ss">available</span><span class="p">:</span> <span class="kp">true</span> <span class="p">}</span>
-  <span class="n">let</span><span class="p">(</span><span class="ss">:performer</span><span class="p">)</span> <span class="p">{</span> <span class="no">User</span><span class="o">.</span><span class="n">create!</span> <span class="p">}</span>
+  let(:book) { Book.create! title: &#39;Learn to fly&#39;, available: true }
+  let(:performer) { User.create! }
 
-  <span class="c1"># describe &#39;preconditions&#39; ...</span>
+  describe &#39;preconditions&#39; do
+    context &#39;when the user rented the book&#39; do
+      before { BA::Book::Rent.as(performer).new(book).perform! }
+      it { is_expected.to be_satisfy_preconditions }
+    end
 
-  <span class="n">describe</span> <span class="s1">&#39;#perform!&#39;</span> <span class="k">do</span>
-    <span class="n">let!</span><span class="p">(</span><span class="ss">:rental</span><span class="p">)</span> <span class="p">{</span> <span class="no">BA</span><span class="o">::</span><span class="no">Book</span><span class="o">::</span><span class="no">Rent</span><span class="o">.</span><span class="n">as</span><span class="p">(</span><span class="n">performer</span><span class="p">)</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">book</span><span class="p">)</span><span class="o">.</span><span class="n">perform!</span> <span class="p">}</span>
+    context &#39;when preconditions fail&#39; do
+      it { is_expected.not_to be_satisfy_preconditions }
+    end
+  end
 
-    <span class="n">specify</span> <span class="k">do</span>
-      <span class="n">expect</span> <span class="p">{</span> <span class="n">action</span><span class="o">.</span><span class="n">perform!</span> <span class="p">}</span>
-        <span class="o">.</span><span class="n">to</span> <span class="n">change</span> <span class="p">{</span> <span class="n">book</span><span class="o">.</span><span class="n">reload</span><span class="o">.</span><span class="n">available</span> <span class="p">}</span><span class="o">.</span><span class="n">from</span><span class="p">(</span><span class="kp">false</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="kp">true</span><span class="p">)</span>
-        <span class="o">.</span><span class="n">and</span> <span class="n">change</span> <span class="p">{</span> <span class="n">rental</span><span class="o">.</span><span class="n">reload</span><span class="o">.</span><span class="n">returned_at</span> <span class="p">}</span><span class="o">.</span><span class="n">from</span><span class="p">(</span><span class="kp">nil</span><span class="p">)</span>
-    <span class="k">end</span>
-  <span class="k">end</span>
-<span class="k">end</span>
+<span class="gi">+   describe &#39;#perform!&#39; do</span>
+<span class="gi">+     let!(:rental) { Rental.create! book: book, user: performer }</span>
+<span class="gi">+ </span>
+<span class="gi">+     specify do</span>
+<span class="gi">+       expect { action.perform! }</span>
+<span class="gi">+         .to change { book.reload.available }.from(false).to(true)</span>
+<span class="gi">+         .and change { rental.reload.returned_at }.from(nil)</span>
+<span class="gi">+     end</span>
+<span class="gi">+   end</span>
+end
 </pre></div>
 
 
@@ -1193,7 +1234,7 @@ business actions and create routes for it.</p>
 
 
 <p>Now is a good opportunity to introduce <a href="../projectors/">projectors</a>.</p>
-<p>The actual implementation contains a few boilerplate codes in the controller that make us repeat a
+<p>The actual implementation contains a few boilerplate code in the controller that make us repeat a
 few different logics that are already in the business action.</p>
 <p>Projectors can help with that. Avoiding the need for creating repetitive
 controller methods and reverify preconditions and policies to decide what
@@ -1357,8 +1398,6 @@ error messages in the title, because if people mouse over, they can see the
     <span class="k">return</span> <span class="k">unless</span> <span class="n">action</span><span class="o">.</span><span class="n">allowed?</span>
     <span class="k">if</span> <span class="n">action</span><span class="o">.</span><span class="n">performable?</span>
       <span class="n">h</span><span class="o">.</span><span class="n">link_to</span> <span class="n">action_label</span><span class="p">,</span> <span class="n">perform_path</span><span class="p">,</span> <span class="nb">method</span><span class="p">:</span> <span class="ss">:post</span>
-    <span class="k">else</span>
-      <span class="n">h</span><span class="o">.</span><span class="n">content_tag</span><span class="p">(</span><span class="ss">:strike</span><span class="p">,</span> <span class="n">action_label</span><span class="p">,</span> <span class="ss">title</span><span class="p">:</span> <span class="n">action</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">full_messages</span><span class="o">.</span><span class="n">to_sentence</span><span class="p">)</span>
     <span class="k">end</span>
   <span class="k">end</span>
 
@@ -1385,23 +1424,6 @@ error messages in the title, because if people mouse over, they can see the
 
 <p>Now it's clear, and the "Return" link will appear only for the user
 that rented the book.</p>
-<p>Look a print screen comparing two users looking for two books. The user from
-the left side has rented "Learn to fly" book.</p>
-<p>Now, look that does not make sense to have the Rent appearing stricken when
-the person is renting the book. We can change the policies to hide the
-action link.</p>
-<div class="codehilite"><pre><span></span><span class="gu">@@ -1,6 +1,7 @@</span>
- # frozen_string_literal: true
-
- class Ba::Book::Rent &lt; BaseAction
-<span class="gi">+  allow_if { !performer.renting?(subject) }</span>
-   allow_if { performer.is_a?(User) }
-
-   projector :inline
-</pre></div>
-
-
-<p>And now the stricken <code>Rent</code> disappeared for the user that is already renting the book.</p>
 <h2 id="wishlistadd">Wishlist::Add<a class="headerlink" href="#wishlistadd" title="Permanent link">&para;</a></h2>
 <h2 id="wishlistremove">Wishlist::Remove<a class="headerlink" href="#wishlistremove" title="Permanent link">&para;</a></h2>
 <h2 id="wishlistnotifyavailability">Wishlist::NotifyAvailability<a class="headerlink" href="#wishlistnotifyavailability" title="Permanent link">&para;</a></h2>
