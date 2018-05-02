@@ -42,6 +42,7 @@ module Granite
     end
 
     include ActiveSupport::Callbacks
+    include ActiveModel::AttributeMethods
     include ActiveData::Model
     include ActiveData::Model::Representation
     include ActiveData::Model::Associations
