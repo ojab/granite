@@ -15,7 +15,6 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'activerecord', '~> 5.0'
   s.add_development_dependency 'capybara', '~> 2.18'
   s.add_development_dependency 'fuubar', '~> 2.0'
-  s.add_development_dependency 'pg', '< 1'
   s.add_development_dependency 'pry-byebug'
   s.add_development_dependency 'rspec', '~> 3.6'
   s.add_development_dependency 'rspec-activemodel-mocks', '~> 1.0'
@@ -26,4 +25,5 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'rubocop', '~> 0.52'
   s.add_development_dependency 'rubocop-rspec', '~> 1.22'
   s.add_development_dependency 'simplecov', '~> 0.15'
+  s.add_development_dependency 'sqlite3'
 end
